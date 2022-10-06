@@ -1,3 +1,5 @@
+// import Chart from 'chart.js/auto';
+
 const urlParams = new URLSearchParams(window.location.search)
 console.log(window.location.search);
 
@@ -21,7 +23,7 @@ class Company {
 
             this.presenProfile(profile);
 
-            this.presentHistoryChart(stockHistory.historical);
+            this.presentHistoryChart(stockHistory);
         } catch(error) {
             console.log('error:', error);
             return;
@@ -85,51 +87,49 @@ class Company {
         document.getElementById('preloader').classList.add('d-none');
     }
 
-    presentHistoryChart(history) {
-        let dates = [];
-        let prices = [];
-        history.forEach((item) => {
-            const {date} = item;
-            dates.push(date);
-            const {close} = item;
-            prices.push(close);
-        });
-        console.log('dates', dates);
-        console.log('prices', prices);
+    presentHistoryChart(history) {        
+        // let dates = [];
+        // let prices = [];
+        // history.forEach((item) => {
+        //     const {date} = item;
+        //     dates.push(date);
+        //     const {close} = item;
+        //     prices.push(close);
+        // });
+        // console.log('dates', dates);
+        // console.log('prices', prices);
         
         const chartContext = document.getElementById('myChart').getContext('2d');
-        let chartLabels = dates;
         const chartConfig = {
             type: 'line',
             data: {
-                labels: chartLabels,
                 datasets: [{
-                    label: 'Stock price history',
-                    data: prices,
+                    label: 'closing price',
+                    data: history.historical,
                     fill: true,
-                    backgroundColor: [
-                        'rgba(255, 99, 132, 0.2)',
-                        'rgba(54, 162, 235, 0.2)',
-                        'rgba(255, 206, 86, 0.2)',
-                        'rgba(75, 192, 192, 0.2)',
-                        'rgba(153, 102, 255, 0.2)',
-                        'rgba(255, 159, 64, 0.2)'
-                    ],
-                    borderColor: [
-                        'rgba(255, 99, 132, 1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1,
+                    pointRadius: 0
                 }]
             },
             options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `${history.symbol} Stock-price History`
+                    }
+                },
+                parsing: {
+                    xAxisKey: 'date',
+                    yAxisKey: 'close'
+                },
                 scales: {
                     y: {
                         beginAtZero: true
+                    },
+                    x: {
+                        reverse: true
                     }
                 }
             }

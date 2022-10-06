@@ -12,12 +12,12 @@
      crossorigin="anonymous">
     <!-- <link href="./css/style.css" rel="stylesheet" /> -->
     <!-- Charts.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" 
+    <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" 
         integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" 
         crossorigin="anonymous" referrerpolicy="no-referrer">
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="./js/company.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="./js/company.js"></script>
     <title>Company</title>
 </head>
 <body>
@@ -40,12 +40,15 @@
         <div class="row">
             <div class="col-3">
                 <div class="row"><h2 id="name" class="text-danger">Name</h2></div>
-                <div id="symbol" class="row">symbol</div>
+                <div class="row">
+                    <div id="symbol" class="col">symbol</div>
+                    <div class="col">(symbol)</div>
+                </div>
             </div>
             <div class="col-3"><img id="image" src="" alt="$name + logo"></div>
         </div>
         <div class="row">
-            <div class="col col-6">
+            <div class="col col-auto">
                 <div id="description" class="row">Description</div>
             </div>
         </div>
