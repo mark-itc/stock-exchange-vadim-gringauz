@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CSS only -->
+    <link
+     href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+     rel="stylesheet"
+     integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+     crossorigin="anonymous">
+    <!-- <link href="./css/style.css" rel="stylesheet" /> -->
+    <!-- Charts.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" 
+        integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./js/company.js"></script>
+    <title>Company</title>
+</head>
+<body>
+    <nav class="navbar navbar-dark navbar-expand-lg bg-danger">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Company Profile</a>
+        </div>
+    </nav>
+    <!-- Preloading Spinner -->
+    <div id="preloader" class="spinner-container d-flex align-items-center d-none">
+        <div class="text-center w-100">
+            <div class="spinner-border text-danger" style="width: 10rem; height: 10rem;" role="status">
+                <span class="visually-hidden"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div id="company-container" class="container">
+        <div class="row">
+            <div class="col-3">
+                <div class="row"><h2 id="name" class="text-danger">Name</h2></div>
+                <div id="symbol" class="row">symbol</div>
+            </div>
+            <div class="col-3"><img id="image" src="" alt="$name + logo"></div>
+        </div>
+        <div class="row">
+            <div class="col col-6">
+                <div id="description" class="row">Description</div>
+            </div>
+        </div>
+        <div class="row">
+            <div id="price" class="col-auto fs-2">Stock Price</div>
+            <div id="change" class="col-auto fw-bolder fs-3">stock change</div>
+        </div>
+        <div id="chart-container" class="row">
+            <div class="col-6">
+                <canvas id="myChart" width="400" height="400"></canvas>
+            </div>
+        </div> 
+    </div>
+
+    <style>
+        .spinner-container {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+    </style>
+</body>
+</html>
