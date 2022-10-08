@@ -1,8 +1,5 @@
 // import Chart from 'chart.js/auto';
 
-const urlParams = new URLSearchParams(window.location.search)
-console.log(window.location.search);
-
 class Company {
     constructor(symbol) {
         this.symbol = symbol;
@@ -25,7 +22,8 @@ class Company {
 
             this.presentHistoryChart(stockHistory);
         } catch(error) {
-            console.log('error:', error);
+            console.log('error inside init:', error);
+            this.presentError();
             return;
         } finally {
             this.turnOffLoading();
@@ -40,29 +38,30 @@ class Company {
             // console.log('companyProfileData: ', companyProfileData);
             return companyProfileData;
         } catch(error) {
-            console.log('error:', error);
+            console.log('error inside getProfile:', error);
+            this.presentError();
             return;
         } 
     }
 
     presenProfile(profile) {
         document.getElementById('name').innerHTML = profile.profile.companyName;
+        document.getElementById('name').href = profile.profile.website;
         document.getElementById('symbol').innerHTML = profile.symbol;
         document.getElementById('description').innerHTML = profile.profile.description;
         document.getElementById('image').src = profile.profile.image;
         document.getElementById('image').alt = profile.profile.companyName + " logo";
         document.getElementById('price').innerHTML = profile.profile.price;
-        let changePercentage  = profile.profile.changes * 10000;
+        let changePercentage  = profile.profile.changes * 100;
         changePercentage  = Math.round(changePercentage);
         changePercentage /= 100;
-        document.getElementById('change').innerHTML = changePercentage + "%";
+        changePercentage *= -1; // Check for positive/negative
+        document.getElementById('change').innerHTML = `(${changePercentage}%)`;
         if (changePercentage < 0) {
             document.getElementById('change').classList.add('text-danger');
         } else if (changePercentage > 0) {
             document.getElementById('change').classList.add('text-success');
         }
-        
-
     }
     
     async getStockHistory(url) {
@@ -73,7 +72,8 @@ class Company {
             // console.log('stockHistoryData: ', stockHistoryData);
             return stockHistoryData;
         } catch(error) {
-            console.log('error:', error);
+            console.log('error inside getStockHistory:', error);
+            presentError(error.message);
             return;
         } 
     }
@@ -137,11 +137,19 @@ class Company {
 
         const myChart = new Chart(chartContext, chartConfig);
     }
+
+    presentError() {
+        console.log('presentError');
+        document.getElementById('company-container').classList.add('invisible');
+        document.getElementById('error-loading').classList.remove('d-none');
+    }
 }
 
 
 
 
 window.onload = () => {
-    const company = new Company("AAON");
+    const urlParams = new URLSearchParams(location.search)
+    const symbol = urlParams.get("symbol"); 
+    const company = new Company(symbol);
 }

@@ -46,7 +46,7 @@ class Search {
             resultTr.id = `search-result-${index}`;
             resultTr.innerHTML = `
                 <th scope="row"></th>
-                <td><a href="#">${searchResult.name} (${searchResult.symbol})</a></td>
+                <td><a href="./company.html?symbol=${searchResult.symbol}">${searchResult.name} (${searchResult.symbol})</a></td>
             `;
             this.tableBody.appendChild(resultTr);
         })
