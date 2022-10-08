@@ -55,12 +55,13 @@ class Company {
         let changePercentage  = profile.profile.changes * 100;
         changePercentage  = Math.round(changePercentage);
         changePercentage /= 100;
-        changePercentage *= -1; // Check for positive/negative
-        document.getElementById('change').innerHTML = `(${changePercentage}%)`;
+        // changePercentage *= -1; 
         if (changePercentage < 0) {
             document.getElementById('change').classList.add('text-danger');
+            document.getElementById('change').innerHTML = `(${changePercentage}%)`;
         } else if (changePercentage > 0) {
             document.getElementById('change').classList.add('text-success');
+            document.getElementById('change').innerHTML = `(+${changePercentage}%)`;
         }
     }
     
