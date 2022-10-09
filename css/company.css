@@ -1,0 +1,10 @@
+.spinner-container {
+    width: 100vw;
+    height: 100vh;
+}
+
+@media screen and (min-width: 900px) {
+    .custom-width {
+        width: 900px;
+    }
+  }
