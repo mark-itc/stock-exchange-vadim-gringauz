@@ -1,5 +1,5 @@
 # JS Project #2: Stock Exchange
-## Milestone 1 - Search Company
+## Milestone 2 Done! 
 ###
 
 Vadim Gringauz
