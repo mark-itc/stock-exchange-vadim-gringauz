@@ -10,21 +10,22 @@
     rel="stylesheet"
     integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
     crossorigin="anonymous">
-    <link href="./css/style.css" rel="stylesheet" />
-    <script type="module" src="./js/app.js"></script>
+    <!-- <link href="./css/search.css" rel="stylesheet" /> -->
+    <script type="module" src="./js/search.js"></script>
     <title>Stock Exchange Project</title>
 </head>
 <body>
     <nav class="navbar navbar-dark navbar-expand-lg bg-danger">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Search NASDAQ Stocks</a>
+            <a class="navbar-brand" href="./index.html">Stock Exchange</a>
         </div>
     </nav>
-    <div class="main-container">
+    <div id="main-container" class="container w-75">
+        <h1 class="text-center">Search NASDAQ Stocks</h1>
         <form class="" id="search-form" role="search">
             <div class="row justify-content-evenly m-3">
                 <div class="col-10">
-                    <input class="form-control w-100 me-2" type="search" placeholder="Search Company" aria-label="Search" id="search-input">
+                    <input id="search-input" class="form-control w-100 me-2" type="search" placeholder="Search Company" aria-label="Search" spellcheck="false">
                 </div>
                 <div class="col-auto">
                     <button id="search-button" class="btn btn-outline-dark" style="width: 130px" type="submit">
@@ -36,18 +37,21 @@
             </div>
         </form>
         <div class="row m-5">
-            <table class="table table-danger table-hover">
+            <table class="table table-hover">
                 <thead>
 
                 </thead>
                 <tbody id="result-table-body">
-                    <!-- <tr>
-                        <th scope="row"></th>
-                        <td><a href="#">AAON, Inc. (AAON)</a></td>
-                    </tr> -->
                     
                 </tbody>
             </table>
+
+            <template id="search-result-template">
+                <tr id=search-result->
+                    <th scope="row"></th>
+                    <td><a href="">[Name] ([Symbol])</a></td>
+                </tr>
+            </template>
         </div>
     </div>
     
