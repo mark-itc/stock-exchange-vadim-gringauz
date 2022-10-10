@@ -18,12 +18,12 @@ class Company {
             const stockHistory = await this.getStockHistory(stockHistoryEndpoint);
             console.log('stockHistory', stockHistory);
 
-            this.presenProfile(profile);
+            this.renderProfile(profile);
 
-            this.presentHistoryChart(stockHistory);
+            this.renderHistoryChart(stockHistory);
         } catch(error) {
             console.log('error inside init:', error);
-            this.presentError();
+            this.renderError();
             return;
         } finally {
             this.turnOffLoading();
@@ -44,7 +44,7 @@ class Company {
         } 
     }
 
-    presenProfile(profile) {
+    renderProfile(profile) {
         document.getElementById('name').innerHTML = profile.profile.companyName;
         document.getElementById('name').href = profile.profile.website;
         document.getElementById('symbol').innerHTML = profile.symbol;
@@ -52,9 +52,7 @@ class Company {
         document.getElementById('image').src = profile.profile.image;
         document.getElementById('image').alt = profile.profile.companyName + " logo";
         document.getElementById('price').innerHTML = profile.profile.price;
-        let changePercentage  = profile.profile.changes * 100;
-        changePercentage  = Math.round(changePercentage);
-        changePercentage /= 100;
+        let changePercentage  = parseFloat(profile.profile.changes).toFixed(2);
         // changePercentage *= -1; 
         if (changePercentage < 0) {
             document.getElementById('change').classList.add('text-danger');
@@ -88,7 +86,7 @@ class Company {
         document.getElementById('preloader').classList.add('d-none');
     }
 
-    presentHistoryChart(history) {        
+    renderHistoryChart(history) {        
         // let dates = [];
         // let prices = [];
         // history.forEach((item) => {

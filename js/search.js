@@ -41,9 +41,9 @@ class Search {
         } finally {this.turnOffLoading();}
     }
 
-    presentResults(searchResults) {
-        console.log('results inside presentResults:', searchResults);
-        searchResults.forEach((searchResult, index) => {
+    renderResults(searchResults) {
+        console.log('results inside renderResults:', searchResults);
+        searchResults.forEach(async(searchResult, index) => {
             console.log(index + ':' + searchResult.name);
             const template = document.getElementById('search-result-template');
             const clone = template.content.cloneNode(true);
@@ -52,8 +52,26 @@ class Search {
             const a = clone.querySelector('a');
             a.href = `./company.html?symbol=${searchResult.symbol}`;
             a.innerHTML = `${searchResult.name} (${searchResult.symbol})`;
+            
+            const moreDetails = await this.getCompSpecs(searchResult.symbol);
+            console.log('moreDetails', moreDetails);
+            const img = clone.querySelector('img');
+            img.src = moreDetails.image;
+            const span = clone.querySelector('span');
+            let changesAsPercentage  = parseFloat(moreDetails.changes).toFixed(2);
+            // changesAsPercentage *= -1; 
+            if (changesAsPercentage < 0) {
+                span.classList.add('text-danger');
+                span.innerHTML = `(${changesAsPercentage}%)`;
+            } else if (changesAsPercentage > 0) {
+                span.classList.add('text-success');
+                span.innerHTML = `(+${changesAsPercentage}%)`;
+            }
+
+            
             this.tableBody.appendChild(clone);
 
+            
 
             // const resultTr = document.createElement('tr');
             // resultTr.id = `search-result-${index}`;
@@ -72,7 +90,7 @@ class Search {
         const endpointURL = `
             ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
         `;
-        this.presentResults(await this.getSearchResults(endpointURL));
+        this.renderResults(await this.getSearchResults(endpointURL));
         this.modifyLocationQuery(searchTerm);
     }
 
@@ -82,9 +100,9 @@ class Search {
         return () => {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-                // console.log('after a while');
-                // console.log('search.searchInput.value=', search.searchInput.value);
-                this.runSearch();
+                console.log('after a while');
+                console.log('search.searchInput.value=', this.searchInput.value);
+                this.runSearch(this.searchInput.value);
             }, timeToWait); 
         }
     }
@@ -96,6 +114,22 @@ class Search {
         const nextState = { additionalInformation: '' };
         const nextTitle = "Stock Exchange Project"
         window.history.replaceState(nextState, nextTitle, nextURL);
+    }
+
+    async getCompSpecs(symbol) {
+        try {
+            const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/${symbol}`;
+            const response = await fetch(url);
+            const companyProfileData = await response.json();
+            // console.log('companyProfileData: ', companyProfileData);
+            return {
+                image: companyProfileData.profile.image,
+                changes: companyProfileData.profile.changes
+            };
+        } catch(error) {
+            console.log('error inside getCompSpecs:', error);
+            return;
+        } 
     }
 
     turnOnLoading() {
@@ -132,14 +166,14 @@ function debounceSearch1(timeToWait) {
     return () => {
         clearTimeout(timeout);
         timeout = setTimeout(async() => {
-            // console.log('after a while');
-            // console.log('search.searchInput.value=', search.searchInput.value);
+            console.log('after a while');
+            console.log('search.searchInput.value=', search.searchInput.value);
             search.reset();
             console.log('searchInput: ', search.searchInput.value);
             const endpointURL = `
                 ${search.endPoint}?query=${search.searchInput.value}&limit=${search.limit}&exchange=${search.exchange}
             `;
-            search.presentResults(await search.getSearchResults(endpointURL));
+            search.renderResults(await search.getSearchResults(endpointURL));
         }, timeToWait); 
     }
 }
