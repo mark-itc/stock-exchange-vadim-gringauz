@@ -13,15 +13,15 @@ class Search {
     #init() {
         document.getElementById('search-form').addEventListener('submit', async (event) => {
             event.preventDefault();
-            this.reset();
-            console.log('searchInput: ', this.searchInput.value);
-            const endpointURL = `
-                ${this.endPoint}?query=${this.searchInput.value}&limit=${this.limit}&exchange=${this.exchange}
-            `;
-            this.presentResults(await this.getSearchResults(endpointURL));
+            this.runSearch(this.searchInput.value);
         });
 
-       
+        const urlParams = new URLSearchParams(location.search)
+        const searchQuery = urlParams.get("query");
+        if (searchQuery) {
+            console.log('the query=', searchQuery);
+            this.runSearch(searchQuery);
+        }       
     }
 
     reset() {
@@ -66,22 +66,36 @@ class Search {
 
     }
 
+    async runSearch(searchTerm) {
+        this.reset();
+        // console.log('searchInput: ', searchTerm);
+        const endpointURL = `
+            ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
+        `;
+        this.presentResults(await this.getSearchResults(endpointURL));
+        this.modifyLocationQuery(searchTerm);
+    }
+
     debounceSearch(timeToWait) {
         let timeout;
     
         return () => {
             clearTimeout(timeout);
-            timeout = setTimeout(async() => {
+            timeout = setTimeout(() => {
                 // console.log('after a while');
                 // console.log('search.searchInput.value=', search.searchInput.value);
-                this.reset();
-                console.log('searchInput: ', this.searchInput.value);
-                const endpointURL = `
-                    ${this.endPoint}?query=${this.searchInput.value}&limit=${this.limit}&exchange=${this.exchange}
-                `;
-                this.presentResults(await this.getSearchResults(endpointURL));
+                this.runSearch();
             }, timeToWait); 
         }
+    }
+
+    modifyLocationQuery(searchTerm) {
+        const urlParams = new URLSearchParams(location.search)
+        urlParams.set('query', searchTerm);        
+        const nextURL = location.origin + location.pathname + '?' + urlParams.toString();
+        const nextState = { additionalInformation: '' };
+        const nextTitle = "Stock Exchange Project"
+        window.history.replaceState(nextState, nextTitle, nextURL);
     }
 
     turnOnLoading() {
@@ -130,7 +144,7 @@ function debounceSearch1(timeToWait) {
     }
 }
 
-window.onload = () => {
+window.onload = () => { 
     // const app = new App();
     const searchProperties = {
         endPoint: 'https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/search',
@@ -138,6 +152,6 @@ window.onload = () => {
         exchange: 'NASDAQ'
     }
     search = new Search(searchProperties);
-    const autoSearch = search.debounceSearch(300);
+    const autoSearch = search.debounceSearch(500);
     search.searchInput.addEventListener('input', autoSearch);
 }
