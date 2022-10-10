@@ -3,6 +3,10 @@
     height: 100vh;
 }
 
+.custom-height {
+    height: 25px;
+}
+
 @media screen and (min-width: 900px) {
     .custom-width {
         width: 900px;
