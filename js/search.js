@@ -1,42 +1,27 @@
+let search = {};
 
 class Search {
     constructor(properties) {
         this.endPoint = properties.endPoint;
         this.limit = properties.limit;
         this.exchange = properties.exchange;
+        this.searchInput = document.getElementById('search-input');
         this.tableBody = document.getElementById('result-table-body');
         this.#init();
     }
 
     #init() {
-        const searchInput = document.getElementById('search-input');
         document.getElementById('search-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             this.reset();
-            console.log('searchInput: ', searchInput.value);
+            console.log('searchInput: ', this.searchInput.value);
             const endpointURL = `
-                ${this.endPoint}?query=${searchInput.value}&limit=${this.limit}&exchange=${this.exchange}
+                ${this.endPoint}?query=${this.searchInput.value}&limit=${this.limit}&exchange=${this.exchange}
             `;
             this.presentResults(await this.getSearchResults(endpointURL));
         });
 
-        // searchInput.addEventListener('input', async (event) => {
-        //     console.log('on input:', searchInput.value);
-        //     let timeout;
-        //     return function sendSearch() {
-        //         console.log('inside');
-        //         clearTimeout(timeout);
-        //         timeout = setTimeout(async () => {
-        //             clearTimeout(timeout);
-        //             this.reset();
-        //             console.log('search keyword: ', searchInput.value);
-        //             const endpointURL = `
-        //                 ${this.endPoint}?query=${searchInput.value}&limit=${this.limit}&exchange=${this.exchange}
-        //             `;
-        //             this.presentResults(await this.getSearchResults(endpointURL));
-        //         }, 300);
-        //     };
-        // });          
+       
     }
 
     reset() {
@@ -109,6 +94,23 @@ class Search {
 //     }
 // }
 
+function debounceSearch(timeToWait) {
+    let timeout;
+
+    return () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(async() => {
+            console.log('after 2 sec');
+            search.reset();
+            console.log('searchInput: ', search.searchInput.value);
+            const endpointURL = `
+                ${search.endPoint}?query=${search.searchInput.value}&limit=${search.limit}&exchange=${search.exchange}
+            `;
+            search.presentResults(await search.getSearchResults(endpointURL));
+        }, timeToWait); 
+    }
+}
+
 window.onload = () => {
     // const app = new App();
     const searchProperties = {
@@ -116,5 +118,8 @@ window.onload = () => {
         limit: 10,
         exchange: 'NASDAQ'
     }
-    const search = new Search(searchProperties);
+    search = new Search(searchProperties);
+
+    const autoSearch = debounceSearch(300);
+    search.searchInput.addEventListener('input', autoSearch);
 }
