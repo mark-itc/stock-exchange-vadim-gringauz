@@ -1,5 +1,5 @@
 # JS Project #2: Stock Exchange
-## Milestone 2 Done! 
+## Milestone 3 Done (v1.1)! 
 ###
 
 Vadim Gringauz
