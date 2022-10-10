@@ -51,21 +51,23 @@ class Search {
             tr.id += index;
             const a = clone.querySelector('a');
             a.href = `./company.html?symbol=${searchResult.symbol}`;
-            a.innerHTML = `${searchResult.name} (${searchResult.symbol})`;
+            a.innerHTML = `${searchResult.name}`;
+            const symbolSpan = clone.querySelector('.symbol');
+            symbolSpan.innerHTML = `(${searchResult.symbol})`;
             
             const moreDetails = await this.getCompSpecs(searchResult.symbol);
             console.log('moreDetails', moreDetails);
             const img = clone.querySelector('img');
             img.src = moreDetails.image;
-            const span = clone.querySelector('span');
+            const changesSpan = clone.querySelector('.changes');
             let changesAsPercentage  = parseFloat(moreDetails.changes).toFixed(2);
             // changesAsPercentage *= -1; 
             if (changesAsPercentage < 0) {
-                span.classList.add('text-danger');
-                span.innerHTML = `(${changesAsPercentage}%)`;
+                changesSpan.classList.add('text-danger');
+                changesSpan.innerHTML = `(${changesAsPercentage}%)`;
             } else if (changesAsPercentage > 0) {
-                span.classList.add('text-success');
-                span.innerHTML = `(+${changesAsPercentage}%)`;
+                changesSpan.classList.add('text-success');
+                changesSpan.innerHTML = `(+${changesAsPercentage}%)`;
             }
 
             
