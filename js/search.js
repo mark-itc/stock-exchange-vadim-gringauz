@@ -66,6 +66,24 @@ class Search {
 
     }
 
+    debounceSearch(timeToWait) {
+        let timeout;
+    
+        return () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(async() => {
+                // console.log('after a while');
+                // console.log('search.searchInput.value=', search.searchInput.value);
+                this.reset();
+                console.log('searchInput: ', this.searchInput.value);
+                const endpointURL = `
+                    ${this.endPoint}?query=${this.searchInput.value}&limit=${this.limit}&exchange=${this.exchange}
+                `;
+                this.presentResults(await this.getSearchResults(endpointURL));
+            }, timeToWait); 
+        }
+    }
+
     turnOnLoading() {
         document.getElementById('search-button').classList.add('disabled');
         document.getElementById('search-spinner').classList.remove('d-none');
@@ -94,13 +112,14 @@ class Search {
 //     }
 // }
 
-function debounceSearch(timeToWait) {
+function debounceSearch1(timeToWait) {
     let timeout;
 
     return () => {
         clearTimeout(timeout);
         timeout = setTimeout(async() => {
-            console.log('after 2 sec');
+            // console.log('after a while');
+            // console.log('search.searchInput.value=', search.searchInput.value);
             search.reset();
             console.log('searchInput: ', search.searchInput.value);
             const endpointURL = `
@@ -119,7 +138,6 @@ window.onload = () => {
         exchange: 'NASDAQ'
     }
     search = new Search(searchProperties);
-
-    const autoSearch = debounceSearch(300);
+    const autoSearch = search.debounceSearch(300);
     search.searchInput.addEventListener('input', autoSearch);
 }
