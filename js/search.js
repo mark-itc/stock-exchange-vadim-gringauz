@@ -71,7 +71,7 @@ class Search {
             const matchingAdditionalData = resultsAdditionalData.filter(result => result.symbol === searchResult.symbol);
             clone.querySelector('img').src = matchingAdditionalData[0].image;
             const changesSpan = clone.querySelector('.changes');
-            let changesAsPercentage  = parseFloat(matchingAdditionalData[0].changes).toFixed(2);
+            let changesAsPercentage  = parseFloat(matchingAdditionalData[0].changesPercentage).toFixed(2);
 
             // changesAsPercentage *= -1; 
             if (changesAsPercentage < 0) {

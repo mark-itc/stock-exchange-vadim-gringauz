@@ -51,8 +51,8 @@ class Company {
         document.getElementById('description').innerHTML = profile.profile.description;
         document.getElementById('image').src = profile.profile.image;
         document.getElementById('image').alt = profile.profile.companyName + " logo";
-        document.getElementById('price').innerHTML = profile.profile.price;
-        let changePercentage  = parseFloat(profile.profile.changes).toFixed(2);
+        document.getElementById('price').innerHTML = "$" + profile.profile.price;
+        let changePercentage  = parseFloat(profile.profile.changesPercentage).toFixed(2);
         // changePercentage *= -1; 
         if (changePercentage < 0) {
             document.getElementById('change').classList.add('text-danger');
