@@ -151,7 +151,7 @@ class Search {
                 const companySpecs = {
                     symbol: data.symbol,
                     image: data.profile.image,
-                    changes: data.profile.changes
+                    changesPercentage: data.profile.changesPercentage
                 }
                 partialProfiles.push(companySpecs);
                 return partialProfiles;
@@ -160,7 +160,7 @@ class Search {
                 const companySpecs = {
                     symbol: profile.symbol,
                     image: profile.profile.image,
-                    changes: profile.profile.changes
+                    changesPercentage: profile.profile.changesPercentage
                 }
                 partialProfiles.push(companySpecs);
             });
