@@ -1,4 +1,3 @@
-let search = {};
 
 class Search {
     constructor(properties) {
@@ -11,17 +10,27 @@ class Search {
     }
 
     #init() {
+        /*RUN SEARCH ON FORM-SUBMIT*/
         document.getElementById('search-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             this.runSearch(this.searchInput.value);
         });
 
+        /*RUN SEARCH AUTOMATICALLY ON TYPING (WITH DELAY!)*/
+        const autoSearch = this.debounceSearch(500);
+        this.searchInput.addEventListener('input', autoSearch);
+
+        /*RUN SEARCH ON PAGE-LOAD IF THERE ARE PARAMS IN URL*/
+        this.runSearchFromUrlParams();
+    }
+
+    runSearchFromUrlParams() {
         const urlParams = new URLSearchParams(location.search)
         const searchQuery = urlParams.get("query");
         if (searchQuery) {
             console.log('the query=', searchQuery);
             this.runSearch(searchQuery);
-        }       
+        }  
     }
 
     reset() {
@@ -30,7 +39,6 @@ class Search {
 
     async getSearchResults(url) {
         try {
-            this.turnOnLoading();
             const response = await fetch(url);
             const allSearchResults = await response.json();
             // console.log('allSearchResults: ', allSearchResults);
@@ -38,29 +46,33 @@ class Search {
         } catch(error) {
             console.log('error:', error);
             return;
-        } finally {this.turnOffLoading();}
+        } 
     }
 
-    renderResults(searchResults) {
-        console.log('results inside renderResults:', searchResults);
+    async renderResults(searchResults) {
+        const symbolsFromResults = this.extractSymbols(searchResults);
+        const resultsAdditionalData = await this.getAdditionalData(symbolsFromResults);
         searchResults.forEach(async(searchResult, index) => {
-            console.log(index + ':' + searchResult.name);
+            // console.log(index + ':' + searchResult.name);
             const template = document.getElementById('search-result-template');
             const clone = template.content.cloneNode(true);
-            const tr = clone.getElementById('search-result-');
-            tr.id += index;
+            clone.getElementById('search-result-').id += index;
             const a = clone.querySelector('a');
             a.href = `./company.html?symbol=${searchResult.symbol}`;
             a.innerHTML = `${searchResult.name}`;
-            const symbolSpan = clone.querySelector('.symbol');
-            symbolSpan.innerHTML = `(${searchResult.symbol})`;
+            clone.querySelector('.symbol').innerHTML = `(${searchResult.symbol})`;
             
-            const moreDetails = await this.getCompSpecs(searchResult.symbol);
-            console.log('moreDetails', moreDetails);
-            const img = clone.querySelector('img');
-            img.src = moreDetails.image;
+            // LEGACY: previous method
+            // const moreDetails = await this.getCompSpecs(searchResult.symbol);
+            // clone.querySelector('img').src = moreDetails.image;
+            // const changesSpan = clone.querySelector('.changes');
+            // let changesAsPercentage  = parseFloat(moreDetails.changes).toFixed(2);
+
+            const matchingAdditionalData = resultsAdditionalData.filter(result => result.symbol === searchResult.symbol);
+            clone.querySelector('img').src = matchingAdditionalData[0].image;
             const changesSpan = clone.querySelector('.changes');
-            let changesAsPercentage  = parseFloat(moreDetails.changes).toFixed(2);
+            let changesAsPercentage  = parseFloat(matchingAdditionalData[0].changes).toFixed(2);
+
             // changesAsPercentage *= -1; 
             if (changesAsPercentage < 0) {
                 changesSpan.classList.add('text-danger');
@@ -68,32 +80,26 @@ class Search {
             } else if (changesAsPercentage > 0) {
                 changesSpan.classList.add('text-success');
                 changesSpan.innerHTML = `(+${changesAsPercentage}%)`;
+            } else {
+                changesSpan.innerHTML = `(${changesAsPercentage}%)`;
             }
-
-            
             this.tableBody.appendChild(clone);
-
-            
-
-            // const resultTr = document.createElement('tr');
-            // resultTr.id = `search-result-${index}`;
-            // resultTr.innerHTML = `
-            //     <th scope="row"></th>
-            //     <td><a href="./company.html?symbol=${searchResult.symbol}">${searchResult.name} (${searchResult.symbol})</a></td>
-            // `;
-            // this.tableBody.appendChild(resultTr);
         })
-
     }
 
     async runSearch(searchTerm) {
-        this.reset();
-        // console.log('searchInput: ', searchTerm);
-        const endpointURL = `
-            ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
-        `;
-        this.renderResults(await this.getSearchResults(endpointURL));
-        this.modifyLocationQuery(searchTerm);
+        try {
+            this.turnOnLoading();
+            this.reset();
+            // console.log('searchInput: ', searchTerm);
+            const endpointURL = `
+                ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
+            `;
+            await this.renderResults(await this.getSearchResults(endpointURL));
+            this.modifyLocationQuery(searchTerm);
+        } catch(error) {
+            console.log('Error caught inside runSearch', error);
+        } finally {this.turnOffLoading();}
     }
 
     debounceSearch(timeToWait) {
@@ -102,8 +108,6 @@ class Search {
         return () => {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-                console.log('after a while');
-                console.log('search.searchInput.value=', this.searchInput.value);
                 this.runSearch(this.searchInput.value);
             }, timeToWait); 
         }
@@ -118,20 +122,68 @@ class Search {
         window.history.replaceState(nextState, nextTitle, nextURL);
     }
 
-    async getCompSpecs(symbol) {
+    // LEGACY: previous method
+    // async getCompSpecs(symbol) {
+    //     try {
+    //         const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/${symbol}`;
+    //         const response = await fetch(url);
+    //         const companyProfileData = await response.json();
+    //         // console.log('companyProfileData: ', companyProfileData);
+    //         return {
+    //             image: companyProfileData.profile.image,
+    //             changes: companyProfileData.profile.changes
+    //         };
+    //     } catch(error) {
+    //         console.log('error inside getCompSpecs:', error);
+    //         return;
+    //     } 
+    // }
+
+    async getMultipleCompanyProfiles(partialProfiles, symbols) {
         try {
-            const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/${symbol}`;
+            let url = "https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/";
+            const symbolsString = symbols.toString();
+            url += symbolsString;
             const response = await fetch(url);
-            const companyProfileData = await response.json();
-            // console.log('companyProfileData: ', companyProfileData);
-            return {
-                image: companyProfileData.profile.image,
-                changes: companyProfileData.profile.changes
-            };
+            const data = await response.json();
+            // console.log('data', data);
+            if (symbols.length === 1) {
+                const companySpecs = {
+                    symbol: data.symbol,
+                    image: data.profile.image,
+                    changes: data.profile.changes
+                }
+                partialProfiles.push(companySpecs);
+                return partialProfiles;
+            }
+            data.companyProfiles.forEach((profile) => {
+                const companySpecs = {
+                    symbol: profile.symbol,
+                    image: profile.profile.image,
+                    changes: profile.profile.changes
+                }
+                partialProfiles.push(companySpecs);
+            });
+            return partialProfiles;
         } catch(error) {
-            console.log('error inside getCompSpecs:', error);
+            console.log('error inside get Multiple Company Profiles:', error);
             return;
         } 
+    }
+
+    async getAdditionalData(allResultSymbols) {
+        let partialProfiles = [];
+        let removedSymbols;
+        while (allResultSymbols.length > 0) {
+            removedSymbols = allResultSymbols.splice(0,3);
+            partialProfiles = await this.getMultipleCompanyProfiles(partialProfiles, removedSymbols);
+        }
+        return partialProfiles;
+    }
+
+    extractSymbols(searchResults) {
+        let symbols = searchResults.map(({ symbol }) => symbol)
+        return symbols;
     }
 
     turnOnLoading() {
@@ -147,6 +199,16 @@ class Search {
     }
 }
 
+window.onload = () => { 
+    const searchProperties = {
+        endPoint: 'https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/search',
+        limit: 10,
+        exchange: 'NASDAQ'
+    }
+    const search = new Search(searchProperties);
+}
+
+
 // class App {
 //     constructor() {
 //         this.#init();
@@ -161,33 +223,3 @@ class Search {
         
 //     }
 // }
-
-function debounceSearch1(timeToWait) {
-    let timeout;
-
-    return () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(async() => {
-            console.log('after a while');
-            console.log('search.searchInput.value=', search.searchInput.value);
-            search.reset();
-            console.log('searchInput: ', search.searchInput.value);
-            const endpointURL = `
-                ${search.endPoint}?query=${search.searchInput.value}&limit=${search.limit}&exchange=${search.exchange}
-            `;
-            search.renderResults(await search.getSearchResults(endpointURL));
-        }, timeToWait); 
-    }
-}
-
-window.onload = () => { 
-    // const app = new App();
-    const searchProperties = {
-        endPoint: 'https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/search',
-        limit: 10,
-        exchange: 'NASDAQ'
-    }
-    search = new Search(searchProperties);
-    const autoSearch = search.debounceSearch(500);
-    search.searchInput.addEventListener('input', autoSearch);
-}
