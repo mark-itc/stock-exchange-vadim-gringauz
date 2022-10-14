@@ -18,11 +18,9 @@ tr {
     transform:translateX(100%);
     /* transform:rotateX(90deg); */
 }
-  
 
 @media screen and (min-width: 900px) {
     .custom-width {
         width: 900px;
     }
-  }
-
+}

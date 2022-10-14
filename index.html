@@ -37,7 +37,7 @@
 
             </div>
         </form>
-        <div id="search-results" class="row m-5 invisible">
+        <div id="search-results" class="row m-5 invisible table-responsive w-75">
             <table class="table table-hover table-borderless">
                 <thead>
 
@@ -48,25 +48,33 @@
             </table>
 
             <template id="search-result-template">
-                <tr id="search-result-" class="row align-items-end border">
+                <tr id="search-result-">
                     <th scope="row"></th>
-                    <td class="col-1 border align-middle">
-                        <img style="height: 25px;" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="">
-                    </td>
-                    <td class="col-6 border align-middle">
-                        <div class="col-auto border">
-                            <a class="fs-4 border" href="">[Name]</a>
+                    <td class="">
+                        <div class="row custom-height">
+                            <div class="col-auto g-1">
+                                <img  style="height: 30px;" class="img-thumbnail" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="">
+                            </div>
                         </div>
-                        <!-- <div class="row custom-height align-items-end border">
-                        </div> -->
                     </td>
-                    <td class="col-auto border align-middle">
-                        <span class="symbol text-secondary">([Symbol])</span>
-                        <span class="changes">([changesPercentage])</span>
-                        <!-- <div class="col-auto">
+                    <td class="overflow-hidden">
+                        <div class="row custom-height align-items-end">
+                            <div class="col-auto">
+                                <a class="fs-4" href="">[Name]</a>
+                                <span class="symbol text-secondary">([Symbol])</span>
+                            </div>
+                            <div class="col-auto">
+                            </div>
+                            <div class="col-auto">
+                            </div>
                         </div>
-                        <div class="col-auto">
-                        </div> -->
+                    </td>
+                    <td>
+                        <div class="row custom-height align-items-end">
+                            <div class="col-auto mt-2">
+                                <span class="changes">([changes])</span>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             </template>

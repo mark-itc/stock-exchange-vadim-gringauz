@@ -172,4 +172,6 @@ window.onload = () => {
     const urlParams = new URLSearchParams(location.search)
     const symbol = urlParams.get("symbol"); 
     const company = new Company(symbol);
+
+    document.getElementById('back-to-search').href = document.referrer;
 }
