@@ -12,15 +12,28 @@
     crossorigin="anonymous">
     <link href="./css/style.css" rel="stylesheet" />
     <script type="module" src="./js/search.js"></script>
+    <script type="module" src="./js/marquee.js"></script>
     <title>Stock Exchange Project</title>
+    <link rel="icon" type="image/x-icon" href="/images/favicon.png">
 </head>
 <body>
     <nav class="navbar navbar-dark navbar-expand-lg bg-danger">
         <div class="container-fluid custom-width">
             <a class="navbar-brand" href="./index.html">Stock Exchange</a>
-            <span>(Milestone 3.1)</span>
+            <span>(Milestone 4)</span>
         </div>
     </nav>
+    <div class="marquee" style="flex-wrap: nowrap;">
+        <div id="marquee-container" class="move d-flex flex-nowrap">
+
+        </div>
+    </div>
+    <template id="marquee-item-template" class="marquee-item">
+        <span  id="marquee-item-" class="m-2" style="flex-wrap: nowrap;">[symbol] [stock price]</span>
+        <!-- <div class="d-inline m-2">
+            <span></span>
+        </div> -->
+    </template>
     <div id="main-container" class="container-fluid custom-width">
         <h1 class="text-center">Search NASDAQ Stocks</h1>
         <form class="" id="search-form" role="search">
@@ -80,6 +93,8 @@
             </template>
         </div>
     </div>
-    
+    <script>
+        
+    </script>
 </body>
 </html>
