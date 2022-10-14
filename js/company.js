@@ -10,13 +10,10 @@ class Company {
     async #init() {
         try {
             this.turnOnLoading();
-            const profileEndpoint = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/${this.symbol}`;
-            const profile = await this.getProfile(profileEndpoint);
-            console.log('profile', profile);
+            const profile = await this.getProfile(this.symbol);
             const stockHistoryEndpoint = 
                 `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/historical-price-full/${this.symbol}?serietype=line`;
             const stockHistory = await this.getStockHistory(stockHistoryEndpoint);
-            console.log('stockHistory', stockHistory);
 
             this.renderProfile(profile);
 
@@ -31,12 +28,27 @@ class Company {
 
     }
 
-    async getProfile(url) {
+    async getProfile(symbol) {
         try {
+            const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/${symbol}`;
             const response = await fetch(url);
             const companyProfileData = await response.json();
             // console.log('companyProfileData: ', companyProfileData);
-            return companyProfileData;
+            if (companyProfileData.symbol) {
+                return companyProfileData;
+            } else {
+                return {
+                   symbol: symbol,
+                   profile: {
+                    companyName: "N/A",
+                    website: "N/A",
+                    description: "N/A",
+                    image: "https://cdn-icons-png.flaticon.com/512/16/16096.png",
+                    price: "0.00",
+                    changesPercentage: 0
+                   } 
+                }
+            }
         } catch(error) {
             console.log('error inside getProfile:', error);
             this.presentError();
@@ -49,17 +61,26 @@ class Company {
         document.getElementById('name').href = profile.profile.website;
         document.getElementById('symbol').innerHTML = profile.symbol;
         document.getElementById('description').innerHTML = profile.profile.description;
-        document.getElementById('image').src = profile.profile.image;
-        document.getElementById('image').alt = profile.profile.companyName + " logo";
-        document.getElementById('price').innerHTML = profile.profile.price;
-        let changePercentage  = parseFloat(profile.profile.changes).toFixed(2);
-        // changePercentage *= -1; 
+
+        const img = document.getElementById('image');
+        img.src = profile.profile.image;
+        img.alt = profile.profile.companyName + " logo";
+        img.addEventListener('error', () => {
+            img.src = "https://www.svgrepo.com/show/92170/not-available-circle.svg";
+        });
+
+        document.getElementById('price').innerHTML = "$" + profile.profile.price;
+        let changePercentage  = parseFloat(profile.profile.changesPercentage).toFixed(2);
+        // changePercentage *= -1;
+        const changeDiv =  document.getElementById('change');
         if (changePercentage < 0) {
-            document.getElementById('change').classList.add('text-danger');
-            document.getElementById('change').innerHTML = `(${changePercentage}%)`;
+            changeDiv.classList.add('text-danger');
+            changeDiv.innerHTML = `(${changePercentage}%)`;
         } else if (changePercentage > 0) {
-            document.getElementById('change').classList.add('text-success');
-            document.getElementById('change').innerHTML = `(+${changePercentage}%)`;
+            changeDiv.classList.add('text-success');
+            changeDiv.innerHTML = `(+${changePercentage}%)`;
+        } else {
+            changeDiv.innerHTML = `(${changePercentage}%)`;
         }
     }
     
@@ -151,4 +172,6 @@ window.onload = () => {
     const urlParams = new URLSearchParams(location.search)
     const symbol = urlParams.get("symbol"); 
     const company = new Company(symbol);
+
+    document.getElementById('back-to-search').href = document.referrer;
 }

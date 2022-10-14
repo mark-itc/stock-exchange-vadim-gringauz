@@ -18,6 +18,7 @@
     <nav class="navbar navbar-dark navbar-expand-lg bg-danger">
         <div class="container-fluid custom-width">
             <a class="navbar-brand" href="./index.html">Stock Exchange</a>
+            <span>(Milestone 3.1)</span>
         </div>
     </nav>
     <div id="main-container" class="container-fluid custom-width">
@@ -36,8 +37,8 @@
 
             </div>
         </form>
-        <div class="row m-5">
-            <table class="table table-hover">
+        <div id="search-results" class="row m-5 invisible table-responsive w-75">
+            <table class="table table-hover table-borderless">
                 <thead>
 
                 </thead>
@@ -47,20 +48,30 @@
             </table>
 
             <template id="search-result-template">
-                <tr id=search-result->
+                <tr id="search-result-">
                     <th scope="row"></th>
-                    <td>
+                    <td class="">
+                        <div class="row custom-height">
+                            <div class="col-auto g-1">
+                                <img  style="height: 30px;" class="img-thumbnail" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="">
+                            </div>
+                        </div>
+                    </td>
+                    <td class="overflow-hidden">
                         <div class="row custom-height align-items-end">
                             <div class="col-auto">
-                                <img style="height: 25px;" src="" alt="">
-                            </div>
-                            <div class="col-auto">
                                 <a class="fs-4" href="">[Name]</a>
-                            </div>
-                            <div class="col-auto">
                                 <span class="symbol text-secondary">([Symbol])</span>
                             </div>
                             <div class="col-auto">
+                            </div>
+                            <div class="col-auto">
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="row custom-height align-items-end">
+                            <div class="col-auto mt-2">
                                 <span class="changes">([changes])</span>
                             </div>
                         </div>

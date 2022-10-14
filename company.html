@@ -24,6 +24,7 @@
     <nav class="navbar navbar-dark navbar-expand-lg bg-danger">
         <div class="container-fluid custom-width">
             <a class="navbar-brand" href="./index.html">Stock Exchange</a>
+            <a id="back-to-search" class="navbar-brand" href="#">&lt;Back to search</a>
         </div>
     </nav>
     <!-- Preloading Spinner -->
@@ -54,7 +55,7 @@
                 <!-- <h2 id="name" class="text-danger text-align-middle">[Name]</h2> -->
             </div>
             <div class="col-auto">
-                <img id="image" src="" alt="$name + logo">
+                <img id="image" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="$name + logo" style="max-height: 150px;">
             </div>
         </div>
         <div class="row">
@@ -65,11 +66,11 @@
         <div class="row align-items-center">
             <div class="col-auto fs-2">Stock Price:</div>
             <div id="price" class="col-auto fs-2">[Stock Price]</div>
-            <div id="change" class="col-auto fw-bolder fs-3">[stock change]</div>
+            <div id="change" class="col-auto fw-bolder fs-3">[stock changes Percentage]</div>
         </div>
         <div id="chart-container" class="row">
             <div class="col-12">
-                <canvas id="myChart" width="400" height="200"></canvas>
+                <canvas id="myChart"></canvas>
             </div>
         </div> 
     </div>
