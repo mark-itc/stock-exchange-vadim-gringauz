@@ -7,8 +7,22 @@
     height: 25px;
 }
 
+table {
+    overflow:hidden;
+}
+
+tr {
+    transition:all 1s ease-in-out;
+}
+.slide-out {
+    transform:translateX(100%);
+    /* transform:rotateX(90deg); */
+}
+  
+
 @media screen and (min-width: 900px) {
     .custom-width {
         width: 900px;
     }
   }
+

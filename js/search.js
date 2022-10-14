@@ -6,6 +6,7 @@ class Search {
         this.exchange = properties.exchange;
         this.searchInput = document.getElementById('search-input');
         this.tableBody = document.getElementById('result-table-body');
+        this.isSearching = false;
         this.#init();
     }
 
@@ -13,7 +14,9 @@ class Search {
         /*RUN SEARCH ON FORM-SUBMIT*/
         document.getElementById('search-form').addEventListener('submit', async (event) => {
             event.preventDefault();
-            this.runSearch(this.searchInput.value);
+            if (!this.isSearching) {
+                this.runSearch(this.searchInput.value);
+            }
         });
 
         /*RUN SEARCH AUTOMATICALLY ON TYPING (WITH DELAY!)*/
@@ -28,7 +31,7 @@ class Search {
         const urlParams = new URLSearchParams(location.search)
         const searchQuery = urlParams.get("query");
         if (searchQuery) {
-            console.log('the query=', searchQuery);
+            this.searchInput.value = searchQuery;
             this.runSearch(searchQuery);
         }  
     }
@@ -50,45 +53,56 @@ class Search {
     }
 
     async renderResults(searchResults) {
-        const symbolsFromResults = this.extractSymbols(searchResults);
-        const resultsAdditionalData = await this.getAdditionalData(symbolsFromResults);
-        searchResults.forEach(async(searchResult, index) => {
-            // console.log(index + ':' + searchResult.name);
-            const template = document.getElementById('search-result-template');
-            const clone = template.content.cloneNode(true);
-            clone.getElementById('search-result-').id += index;
-            const a = clone.querySelector('a');
-            a.href = `./company.html?symbol=${searchResult.symbol}`;
-            a.innerHTML = `${searchResult.name}`;
-            clone.querySelector('.symbol').innerHTML = `(${searchResult.symbol})`;
-            
-            // LEGACY: previous method
-            // const moreDetails = await this.getCompSpecs(searchResult.symbol);
-            // clone.querySelector('img').src = moreDetails.image;
-            // const changesSpan = clone.querySelector('.changes');
-            // let changesAsPercentage  = parseFloat(moreDetails.changes).toFixed(2);
+        try {
+            const symbolsFromResults = this.extractSymbols(searchResults);
+            const resultsAdditionalData = await this.getAdditionalData(symbolsFromResults);
+            searchResults.forEach(async(searchResult, index) => {
+                // console.log(index + ':' + searchResult.name);
+                const template = document.getElementById('search-result-template');
+                const clone = template.content.cloneNode(true);
+                clone.getElementById('search-result-').id += index;
+                const a = clone.querySelector('a');
+                a.href = `./company.html?symbol=${searchResult.symbol}`;
+                a.innerHTML = `${searchResult.name}`;
+                clone.querySelector('.symbol').innerHTML = `(${searchResult.symbol})`;
+                
+                // LEGACY: previous method
+                // const moreDetails = await this.getCompSpecs(searchResult.symbol);
+                // clone.querySelector('img').src = moreDetails.image;
+                // const changesSpan = clone.querySelector('.changes');
+                // let changesAsPercentage  = parseFloat(moreDetails.changes).toFixed(2);
+    
+                const matchingAdditionalData = resultsAdditionalData.filter(result => result.symbol === searchResult.symbol);
+                const img = clone.querySelector('img');
+                img.src = matchingAdditionalData[0].image;
+                img.addEventListener('error', () => {
+                    console.log('error loading img');
+                    img.src = "https://www.svgrepo.com/show/92170/not-available-circle.svg";
+                });
+                const changesSpan = clone.querySelector('.changes');
+                let changesAsPercentage  = parseFloat(matchingAdditionalData[0].changesPercentage).toFixed(2);
+    
+                // changesAsPercentage *= -1; 
+                if (changesAsPercentage < 0) {
+                    changesSpan.classList.add('text-danger');
+                    changesSpan.innerHTML = `(${changesAsPercentage}%)`;
+                } else if (changesAsPercentage > 0) {
+                    changesSpan.classList.add('text-success');
+                    changesSpan.innerHTML = `(+${changesAsPercentage}%)`;
+                } else {
+                    changesSpan.innerHTML = `(${changesAsPercentage}%)`;
+                }
+                this.tableBody.appendChild(clone);
+            });
 
-            const matchingAdditionalData = resultsAdditionalData.filter(result => result.symbol === searchResult.symbol);
-            clone.querySelector('img').src = matchingAdditionalData[0].image;
-            const changesSpan = clone.querySelector('.changes');
-            let changesAsPercentage  = parseFloat(matchingAdditionalData[0].changesPercentage).toFixed(2);
-
-            // changesAsPercentage *= -1; 
-            if (changesAsPercentage < 0) {
-                changesSpan.classList.add('text-danger');
-                changesSpan.innerHTML = `(${changesAsPercentage}%)`;
-            } else if (changesAsPercentage > 0) {
-                changesSpan.classList.add('text-success');
-                changesSpan.innerHTML = `(+${changesAsPercentage}%)`;
-            } else {
-                changesSpan.innerHTML = `(${changesAsPercentage}%)`;
-            }
-            this.tableBody.appendChild(clone);
-        })
+        } catch(error) {
+            console.log('Error renderig:', error);
+        }
     }
 
     async runSearch(searchTerm) {
         try {
+            console.log('start of sreach for term=', searchTerm);
             this.turnOnLoading();
             this.reset();
             // console.log('searchInput: ', searchTerm);
@@ -96,6 +110,7 @@ class Search {
                 ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
             `;
             await this.renderResults(await this.getSearchResults(endpointURL));
+            this.slideInTable();
             this.modifyLocationQuery(searchTerm);
         } catch(error) {
             console.log('Error caught inside runSearch', error);
@@ -108,7 +123,9 @@ class Search {
         return () => {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-                this.runSearch(this.searchInput.value);
+                if (!this.isSearching) {
+                    this.runSearch(this.searchInput.value);
+                }
             }, timeToWait); 
         }
     }
@@ -147,16 +164,28 @@ class Search {
             const response = await fetch(url);
             const data = await response.json();
             // console.log('data', data);
+            
             if (symbols.length === 1) {
-                const companySpecs = {
-                    symbol: data.symbol,
-                    image: data.profile.image,
-                    changesPercentage: data.profile.changesPercentage
+                if (data.symbol) {
+                    const companySpecs = {
+                        symbol: data.symbol,
+                        image: data.profile.image,
+                        changesPercentage: data.profile.changesPercentage
+                    }
+                    partialProfiles.push(companySpecs);
+                    return partialProfiles;
+                } else {
+                    return [{
+                        symbol: symbols[0],
+                        image: "https://cdn-icons-png.flaticon.com/512/16/16096.png",
+                        changesPercentage: 0
+                       
+                    }];
                 }
-                partialProfiles.push(companySpecs);
-                return partialProfiles;
+                
             }
-            data.companyProfiles.forEach((profile) => {
+            const fixedData = this.compinsateMissingProfile(symbols, data);
+            fixedData.companyProfiles.forEach((profile) => {
                 const companySpecs = {
                     symbol: profile.symbol,
                     image: profile.profile.image,
@@ -186,16 +215,61 @@ class Search {
         return symbols;
     }
 
+    // Some Company Symbols return empty object from endpoint
+    compinsateMissingProfile(symbols, data) {
+        if (symbols.length === data.companyProfiles.length) {
+            return data;
+        } else {
+            symbols.forEach((symbol) => {
+                if (data.companyProfiles.find(element => element.symbol === symbol)) {
+                    console.log('exists:', symbol);
+                } else {
+                    console.log('does not exist:', symbol);
+                    const missingProfile = {
+                        symbol: symbol,
+                        profile: {
+                            image: "https://cdn-icons-png.flaticon.com/512/16/16096.png",
+                            changesPercentage: 0
+                        }
+                    };
+                    data.companyProfiles.push(missingProfile);
+                }
+            });
+            return data;
+        }
+    }
+
     turnOnLoading() {
+        this.isSearching = true;
         document.getElementById('search-button').classList.add('disabled');
         document.getElementById('search-spinner').classList.remove('d-none');
         document.getElementById('search-button-text').innerHTML = "Searching...";
+        document.getElementById('search-results').classList.add('invisible');
     }
 
     turnOffLoading() {
+        this.isSearching = false;
         document.getElementById('search-button').classList.remove('disabled');
         document.getElementById('search-spinner').classList.add('d-none');
         document.getElementById('search-button-text').innerHTML = "Search";
+        document.getElementById('search-results').classList.remove('invisible');
+    }
+
+    slideInTable() {
+        const rows = Array.from(document.querySelectorAll('tr'));
+
+        function slideOut(row) {
+          row.classList.add('slide-out');
+        }
+        
+        function slideIn(row, index) {
+          setTimeout(function() {
+            row.classList.remove('slide-out');
+          }, (index + 5) * 100);  
+        }
+        
+        rows.forEach(slideOut);
+        rows.forEach(slideIn); 
     }
 }
 
