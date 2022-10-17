@@ -11,8 +11,10 @@
     integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
     crossorigin="anonymous">
     <link href="./css/style.css" rel="stylesheet" />
-    <script type="module" src="./js/search.js"></script>
+    <script type="module" src="./js/index.js"></script>
     <script type="module" src="./js/marquee.js"></script>
+    <script type="module" src="./js/searchresult.js"></script>
+    <script type="module" src="./js/searchform.js"></script>
     <title>Stock Exchange Project</title>
     <link rel="icon" type="image/x-icon" href="/images/favicon.png">
 </head>
@@ -21,7 +23,7 @@
         <nav class="navbar navbar-dark navbar-expand-lg bg-danger">
             <div class="container-fluid custom-width">
                 <a class="navbar-brand" href="./index.html">Stock Exchange</a>
-                <span>(Milestone 4)</span>
+                <span>(Milestone 6)</span>
             </div>
         </nav>
         <div id="marquee" class="marquee d-none" style="flex-wrap: nowrap;"></div>
@@ -34,18 +36,11 @@
     <div id="main-container" class="container-fluid custom-width">
         <h1 class="text-center">Search NASDAQ Stocks</h1>
         <div id="form"></div>
-        <div id="search-results" class="row m-5 d-none table-responsive w-75"></div>
-        <div id="search-not-found" class="d-none">
-            <div class="row justify-content-center align-items-center">
-                <div class="col-2">
-                    <img src="https://www.svgrepo.com/show/164118/sad.svg" class="img-fluid">
-                </div>
-                <div class="col-auto fs-3">Sorry, no match was found</div>
-            </div>
+        <div id="search-results" class="row m-5 d-none table-responsive w-75">
         </div>
     </div>
     <script>
-        
+        // I used index.js for this part
     </script>
 </body>
 </html>

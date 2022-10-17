@@ -1,4 +1,10 @@
-class Marquee {
+/* *********************************************
+*         JS Project #2 - Stock Exchange       * 
+*                 marquee.js:                  *
+*     All index.html marquee functionality     *
+* **********************************************/
+
+export class Marquee {
     constructor(properties) {
         this.container = properties.container;
         this.limit = properties.limit;
@@ -63,16 +69,4 @@ class Marquee {
 
 }
 
-const marqueeProperies = {
-    container: document.getElementById('marquee'),
-    containerA: document.getElementById('marquee-container-a'),
-    containerB: document.getElementById('marquee-container-b'),
-    limit: 100
-}
 
-let marquee = new Marquee(marqueeProperies);
-marquee.load();
-window.addEventListener('resize', (event) => {
-    marquee = new Marquee(marqueeProperies);
-    marquee.load();
-})

@@ -1,18 +1,37 @@
-let form = {};
-let results = {};
+/* *********************************************
+*         JS Project #2 - Stock Exchange       * 
+*              SearchResult.js:                *
+*       All search results functionality       *
+* **********************************************/
 
-class SearchResults {
+export class SearchResult {
     constructor(container) {
         this.container = container
         this.#init();
     }
 
     async #init() {
-        await this.renderTable();
+        await this.renderHTML();
         this.tableBody = document.getElementById('result-table-body');
+
+        document.addEventListener('resetResults', (event) => {
+            document.getElementById('search-results').classList.add('d-none');
+            this.reset();
+        });
+
+        document.addEventListener('renderResults', async(event) => {
+            if (event.detail.length === 0) {
+                document.getElementById('search-not-found').classList.remove('d-none');
+            } else {
+                await this.renderResults(event.detail);
+                document.getElementById('search-results').classList.remove('d-none');
+                this.slideInTable();
+            }
+        });
+        
     }
 
-    async renderTable() {
+    async renderHTML() {
         const HTML = `
             <table class="table table-hover table-borderless">
                 <thead></thead>
@@ -52,6 +71,19 @@ class SearchResults {
             </template>
         `;
         this.container.innerHTML = HTML;
+        
+        const noMatchDiv = document.createElement('div');
+        noMatchDiv.id = "search-not-found";
+        noMatchDiv.classList.add('d-none');
+        noMatchDiv.innerHTML = `
+            <div class="row justify-content-center align-items-center">
+                <div class="col-2">
+                    <img src="https://www.svgrepo.com/show/164118/sad.svg" class="img-fluid">
+                </div>
+                <div class="col-auto fs-3">Sorry, no match was found</div>
+            </div>
+        `;
+        document.getElementById('main-container').appendChild(noMatchDiv);
     }
 
     reset() {
@@ -224,147 +256,4 @@ class SearchResults {
         rows.forEach(slideOut);
         rows.forEach(slideIn); 
     }
-}
-
-class SearchForm {
-    constructor(container) {
-        this.container = container;
-        this.endPoint = 'https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/search';
-        this.limit = 10;
-        this.exchange = 'NASDAQ';
-        this.searchInput = {};   // maybe can delete this
-        this.isSearching = false;
-        this.#init();
-    }
-
-    async #init() {
-        await this.renderForm();
-        this.searchInput = document.getElementById('search-input');
-
-        /*RUN SEARCH ON FORM-SUBMIT*/
-        document.getElementById('search-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            if (!this.isSearching) {
-                this.runSearch(this.searchInput.value);
-            }
-        });
-
-        /*RUN SEARCH AUTOMATICALLY ON TYPING (WITH DELAY!)*/
-        const autoSearch = this.debounceSearch(500);
-        this.searchInput.addEventListener('input', autoSearch);
-
-        /*RUN SEARCH ON PAGE-LOAD IF THERE ARE PARAMS IN URL*/
-        this.runSearchFromUrlParams();
-    }
-
-    async renderForm() {
-        const HTML = `
-            <form class="" id="search-form" role="search">
-                <div class="row justify-content-evenly m-3 g-0">
-                    <div class="col-9">
-                        <input id="search-input" class="form-control w-100 me-2" type="search" placeholder="Search Company" aria-label="Search" spellcheck="false">
-                    </div>
-                    <div class="col-auto">
-                        <button id="search-button" class="btn btn-outline-dark" style="width: 130px" type="submit">
-                            <span id="search-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                            <span id="search-button-text">Search</span>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        `;
-        this.container.innerHTML = HTML;
-    }
-
-    runSearchFromUrlParams() {
-        const urlParams = new URLSearchParams(location.search)
-        const searchQuery = urlParams.get("query");
-        if (searchQuery) {
-            this.searchInput.value = searchQuery;
-            this.runSearch(searchQuery);
-        }  
-    }
-
-    async runSearch(searchTerm) {
-        try {
-            console.log('start of sreach for term=', searchTerm);
-            this.turnOnLoading();
-            // CHANGE!!!
-            document.getElementById('search-results').classList.add('d-none');
-            results.reset();
-            // END CHANGE
-
-            const endpointURL = `
-                ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
-            `;
-            this.modifyLocationQuery(searchTerm);
-            const searchResults = await this.getSearchResults(endpointURL);
-            if (searchResults.length === 0) {
-                // CHANGE!!! 
-                document.getElementById('search-not-found').classList.remove('d-none');
-            } else {
-                // CHANGE!!! 
-                await results.renderResults(searchResults);
-                document.getElementById('search-results').classList.remove('d-none');
-                results.slideInTable();
-            }
-        } catch(error) {
-            console.log('Error caught inside runSearch', error);
-        } finally {this.turnOffLoading();}
-    }
-
-    async getSearchResults(url) {
-        try {
-            const response = await fetch(url);
-            const allSearchResults = await response.json();
-            // console.log('allSearchResults: ', allSearchResults);
-            return allSearchResults;
-        } catch(error) {
-            console.log('error:', error);
-            return;
-        } 
-    }
-
-    debounceSearch(timeToWait) {
-        let timeout;
-    
-        return () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                if (!this.isSearching) {
-                    this.runSearch(this.searchInput.value);
-                }
-            }, timeToWait); 
-        }
-    }
-
-    modifyLocationQuery(searchTerm) {
-        const urlParams = new URLSearchParams(location.search)
-        urlParams.set('query', searchTerm);        
-        const nextURL = location.origin + location.pathname + '?' + urlParams.toString();
-        const nextState = { additionalInformation: '' };
-        const nextTitle = "Stock Exchange Project"
-        window.history.replaceState(nextState, nextTitle, nextURL);
-    }
-
-
-
-    turnOnLoading() {
-        this.isSearching = true;
-        document.getElementById('search-button').classList.add('disabled');
-        document.getElementById('search-spinner').classList.remove('d-none');
-        document.getElementById('search-button-text').innerHTML = "Searching...";
-    }
-
-    turnOffLoading() {
-        this.isSearching = false;
-        document.getElementById('search-button').classList.remove('disabled');
-        document.getElementById('search-spinner').classList.add('d-none');
-        document.getElementById('search-button-text').innerHTML = "Search";
-    }
-}
-
-window.onload = async() => { 
-    results = new SearchResults(document.getElementById('search-results'));
-    form = new SearchForm(document.getElementById('form'));
 }
