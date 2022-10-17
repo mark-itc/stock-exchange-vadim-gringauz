@@ -7,6 +7,7 @@
 export class SearchResult {
     constructor(container) {
         this.container = container
+        this.searchedTerm = "";
         this.#init();
     }
 
@@ -23,7 +24,8 @@ export class SearchResult {
             if (event.detail.length === 0) {
                 document.getElementById('search-not-found').classList.remove('d-none');
             } else {
-                await this.renderResults(event.detail);
+                this.searchedTerm = event.detail.searchedTerm;
+                await this.renderResults(event.detail.results);
                 document.getElementById('search-results').classList.remove('d-none');
                 this.slideInTable();
             }
@@ -101,8 +103,8 @@ export class SearchResult {
                 clone.getElementById('search-result-').id += index;
                 const a = clone.querySelector('a');
                 a.href = `./company.html?symbol=${searchResult.symbol}`;
-                a.innerHTML = `${searchResult.name}`;
-                clone.querySelector('.symbol').innerHTML = `(${searchResult.symbol})`;
+                a.innerHTML = `${this.highlightTerm(this.searchedTerm, searchResult.name)}`;
+                clone.querySelector('.symbol').innerHTML = `(${this.highlightTerm(this.searchedTerm, searchResult.symbol)})`;
                 
                 // LEGACY: previous method
                 // const moreDetails = await this.getCompSpecs(searchResult.symbol);
@@ -255,5 +257,12 @@ export class SearchResult {
         
         rows.forEach(slideOut);
         rows.forEach(slideIn); 
+    }
+
+    highlightTerm(term, string) {
+        let newString = "";
+        const regexTerm = new RegExp(term, 'i');
+        newString = string.replace(regexTerm,`<mark>$&</mark>`);
+        return newString;
     }
 }

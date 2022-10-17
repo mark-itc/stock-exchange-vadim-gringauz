@@ -40,8 +40,15 @@ tr {
 .move.first {
     animation: scroll-left-from-left 100s linear infinite;
 }
+.move.first:hover {
+    animation-play-state: paused;
+}
+
 .move.second {
     animation: scroll-left-from-right 100s linear infinite;
+}
+.move.second:hover {
+    animation-play-state: paused;
 }
 
 .marquee-element:nth-child(3n) {

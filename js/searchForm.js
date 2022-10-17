@@ -76,7 +76,12 @@ export class SearchForm {
             `;
             this.modifyLocationQuery(searchTerm);
             const searchResults = await this.getSearchResults(endpointURL);
-            const renderResults = new CustomEvent("renderResults", {detail: searchResults});
+            const renderResults = new CustomEvent("renderResults", {
+                detail: {
+                    results: searchResults,
+                    searchedTerm: searchTerm
+                }
+            });
             document.dispatchEvent(renderResults);
         } catch(error) {
             console.log('Error caught inside runSearch', error);
