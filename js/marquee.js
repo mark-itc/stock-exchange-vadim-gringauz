@@ -1,11 +1,14 @@
 class Marquee {
     constructor(properties) {
-        this.container = properties.container;
+        this.containerA = properties.containerA;
+        this.containerB = properties.containerB;
+        this.limit = properties.limit;
+        this.itemWidth = 61;
         this.#init();
     }
     
     async #init() {
-        this.renderData(await this.getData(100));
+        this.renderData(await this.getData(this.limit));
     }
 
     async getData(limit) {
@@ -13,7 +16,6 @@ class Marquee {
             const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/stock-screener?exchange=NASDAQ&limit=${limit}`;
             const response = await fetch(url);
             const fullData = await response.json();
-            console.log('full Data=', fullData);
             return fullData.map(({price, symbol}) => ({ symbol: symbol, price: price }));
         } catch(error) {
             console.log('Error inside get data:', error);
@@ -22,19 +24,42 @@ class Marquee {
     }
 
     renderData(stockPrices) {
-        console.log('stockPrices=', stockPrices);
+        stockPrices = this.multiplyToFitWindow(stockPrices);
+        this.renderSeriesOfItems(stockPrices, this.containerA, 'a');
+        this.renderSeriesOfItems(stockPrices, this.containerB, 'b');
+        
+    }
+
+    renderSeriesOfItems(stockPrices, container, seriesId) {
         stockPrices.forEach((stock, index) => {
             const template = document.getElementById('marquee-item-template');
             const clone = template.content.cloneNode(true);
-            clone.getElementById('marquee-item-').id += index;
+            clone.getElementById('marquee-item-').id += `${seriesId}-${index}`;
             clone.querySelector('span').innerHTML = `${stock.symbol} ${stock.price}`;
-            this.container.appendChild(clone);
+            container.appendChild(clone);
         });
     }
+    multiplyToFitWindow(stockPrices) {
+        const numOfItemsOnWindow = parseInt(window.innerWidth/this.itemWidth);
+        if(stockPrices.length < numOfItemsOnWindow) {
+            const originalArray = stockPrices;
+            for(let index = 0; index < numOfItemsOnWindow/originalArray.length-1; index++) {
+                stockPrices = stockPrices.concat(originalArray);
+            }
+        }
+        return stockPrices;
+    }
+    
+
 }
 
 const marqueeProperies = {
-    container: document.getElementById('marquee-container')
+    containerA: document.getElementById('marquee-container-a'),
+    containerB: document.getElementById('marquee-container-b'),
+    limit: 100
 }
 
-const marquee = new Marquee(marqueeProperies);
+let marquee = new Marquee(marqueeProperies);
+window.addEventListener('resize', (event) => {
+    marquee = new Marquee(marqueeProperies);
+})

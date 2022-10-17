@@ -37,6 +37,7 @@ class Search {
     }
 
     reset() {
+        document.getElementById('search-not-found').classList.add('d-none');
         this.tableBody.innerHTML = '';
     }
 
@@ -104,14 +105,21 @@ class Search {
         try {
             console.log('start of sreach for term=', searchTerm);
             this.turnOnLoading();
+            document.getElementById('search-results').classList.add('d-none');
             this.reset();
             // console.log('searchInput: ', searchTerm);
             const endpointURL = `
                 ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
             `;
-            await this.renderResults(await this.getSearchResults(endpointURL));
-            this.slideInTable();
             this.modifyLocationQuery(searchTerm);
+            const searchResults = await this.getSearchResults(endpointURL);
+            if (searchResults.length === 0) {
+                document.getElementById('search-not-found').classList.remove('d-none');
+            } else {
+                await this.renderResults(searchResults);
+                document.getElementById('search-results').classList.remove('d-none');
+                this.slideInTable();
+            }
         } catch(error) {
             console.log('Error caught inside runSearch', error);
         } finally {this.turnOffLoading();}
@@ -244,7 +252,6 @@ class Search {
         document.getElementById('search-button').classList.add('disabled');
         document.getElementById('search-spinner').classList.remove('d-none');
         document.getElementById('search-button-text').innerHTML = "Searching...";
-        document.getElementById('search-results').classList.add('invisible');
     }
 
     turnOffLoading() {
@@ -252,7 +259,6 @@ class Search {
         document.getElementById('search-button').classList.remove('disabled');
         document.getElementById('search-spinner').classList.add('d-none');
         document.getElementById('search-button-text').innerHTML = "Search";
-        document.getElementById('search-results').classList.remove('invisible');
     }
 
     slideInTable() {

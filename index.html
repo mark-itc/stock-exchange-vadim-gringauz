@@ -17,22 +17,22 @@
     <link rel="icon" type="image/x-icon" href="/images/favicon.png">
 </head>
 <body>
-    <nav class="navbar navbar-dark navbar-expand-lg bg-danger">
-        <div class="container-fluid custom-width">
-            <a class="navbar-brand" href="./index.html">Stock Exchange</a>
-            <span>(Milestone 4)</span>
+    <header>
+        <nav class="navbar navbar-dark navbar-expand-lg bg-danger">
+            <div class="container-fluid custom-width">
+                <a class="navbar-brand" href="./index.html">Stock Exchange</a>
+                <span>(Milestone 4)</span>
+            </div>
+        </nav>
+        <div class="marquee" style="flex-wrap: nowrap;">
+            <div id="marquee-container-a" class="move first d-flex flex-nowrap">
+            </div>
+            <div id="marquee-container-b" class="move second d-flex flex-nowrap">
+            </div>
         </div>
-    </nav>
-    <div class="marquee" style="flex-wrap: nowrap;">
-        <div id="marquee-container" class="move d-flex flex-nowrap">
-
-        </div>
-    </div>
+    </header>
     <template id="marquee-item-template" class="marquee-item">
-        <span  id="marquee-item-" class="m-2" style="flex-wrap: nowrap;">[symbol] [stock price]</span>
-        <!-- <div class="d-inline m-2">
-            <span></span>
-        </div> -->
+        <span  id="marquee-item-" class="marquee-element m-2" style="flex-wrap: nowrap;">[symbol] [stock price]</span>
     </template>
     <div id="main-container" class="container-fluid custom-width">
         <h1 class="text-center">Search NASDAQ Stocks</h1>
@@ -50,7 +50,7 @@
 
             </div>
         </form>
-        <div id="search-results" class="row m-5 invisible table-responsive w-75">
+        <div id="search-results" class="row m-5 d-none table-responsive w-75">
             <table class="table table-hover table-borderless">
                 <thead>
 
@@ -91,6 +91,14 @@
                     </td>
                 </tr>
             </template>
+        </div>
+        <div id="search-not-found" class="d-none">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-2">
+                    <img src="https://www.svgrepo.com/show/164118/sad.svg" class="img-fluid">
+                </div>
+                <div class="col-auto fs-3">Sorry, no match was found</div>
+            </div>
         </div>
     </div>
     <script>
