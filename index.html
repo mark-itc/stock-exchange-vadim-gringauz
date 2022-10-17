@@ -24,74 +24,17 @@
                 <span>(Milestone 4)</span>
             </div>
         </nav>
-        <div class="marquee" style="flex-wrap: nowrap;">
-            <div id="marquee-container-a" class="move first d-flex flex-nowrap">
-            </div>
-            <div id="marquee-container-b" class="move second d-flex flex-nowrap">
-            </div>
-        </div>
+        <div id="marquee" class="marquee d-none" style="flex-wrap: nowrap;"></div>
     </header>
+
     <template id="marquee-item-template" class="marquee-item">
         <span  id="marquee-item-" class="marquee-element m-2" style="flex-wrap: nowrap;">[symbol] [stock price]</span>
     </template>
+
     <div id="main-container" class="container-fluid custom-width">
         <h1 class="text-center">Search NASDAQ Stocks</h1>
-        <form class="" id="search-form" role="search">
-            <div class="row justify-content-evenly m-3 g-0">
-                <div class="col-9">
-                    <input id="search-input" class="form-control w-100 me-2" type="search" placeholder="Search Company" aria-label="Search" spellcheck="false">
-                </div>
-                <div class="col-auto">
-                    <button id="search-button" class="btn btn-outline-dark" style="width: 130px" type="submit">
-                        <span id="search-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                        <span id="search-button-text">Search</span>
-                    </button>
-                </div>
-
-            </div>
-        </form>
-        <div id="search-results" class="row m-5 d-none table-responsive w-75">
-            <table class="table table-hover table-borderless">
-                <thead>
-
-                </thead>
-                <tbody id="result-table-body">
-                    
-                </tbody>
-            </table>
-
-            <template id="search-result-template">
-                <tr id="search-result-">
-                    <th scope="row"></th>
-                    <td class="">
-                        <div class="row custom-height">
-                            <div class="col-auto g-1">
-                                <img  style="height: 30px;" class="img-thumbnail" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="">
-                            </div>
-                        </div>
-                    </td>
-                    <td class="overflow-hidden">
-                        <div class="row custom-height align-items-end">
-                            <div class="col-auto">
-                                <a class="fs-4" href="">[Name]</a>
-                                <span class="symbol text-secondary">([Symbol])</span>
-                            </div>
-                            <div class="col-auto">
-                            </div>
-                            <div class="col-auto">
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="row custom-height align-items-end">
-                            <div class="col-auto mt-2">
-                                <span class="changes">([changes])</span>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </template>
-        </div>
+        <div id="form"></div>
+        <div id="search-results" class="row m-5 d-none table-responsive w-75"></div>
         <div id="search-not-found" class="d-none">
             <div class="row justify-content-center align-items-center">
                 <div class="col-2">

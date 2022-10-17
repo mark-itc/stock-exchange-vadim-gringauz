@@ -1,13 +1,13 @@
 class Marquee {
     constructor(properties) {
-        this.containerA = properties.containerA;
-        this.containerB = properties.containerB;
+        this.container = properties.container;
         this.limit = properties.limit;
         this.itemWidth = 61;
-        this.#init();
     }
     
-    async #init() {
+    async load() {
+        this.renderContainers();
+        this.container.classList.remove('d-none');
         this.renderData(await this.getData(this.limit));
     }
 
@@ -23,10 +23,20 @@ class Marquee {
         }
     }
 
+    renderContainers() {
+        const HTML = `
+            <div id="marquee-container-a" class="move first d-flex flex-nowrap"></div>
+            <div id="marquee-container-b" class="move second d-flex flex-nowrap"></div>
+        `;
+        this.container.innerHTML = HTML;
+    }
+
     renderData(stockPrices) {
+        const containerA = document.getElementById('marquee-container-a');
+        const containerB = document.getElementById('marquee-container-b');
         stockPrices = this.multiplyToFitWindow(stockPrices);
-        this.renderSeriesOfItems(stockPrices, this.containerA, 'a');
-        this.renderSeriesOfItems(stockPrices, this.containerB, 'b');
+        this.renderSeriesOfItems(stockPrices, containerA, 'a');
+        this.renderSeriesOfItems(stockPrices, containerB, 'b');
         
     }
 
@@ -35,7 +45,7 @@ class Marquee {
             const template = document.getElementById('marquee-item-template');
             const clone = template.content.cloneNode(true);
             clone.getElementById('marquee-item-').id += `${seriesId}-${index}`;
-            clone.querySelector('span').innerHTML = `${stock.symbol} ${stock.price}`;
+            clone.querySelector('span').innerHTML = `${stock.symbol} $${stock.price}`;
             container.appendChild(clone);
         });
     }
@@ -54,12 +64,15 @@ class Marquee {
 }
 
 const marqueeProperies = {
+    container: document.getElementById('marquee'),
     containerA: document.getElementById('marquee-container-a'),
     containerB: document.getElementById('marquee-container-b'),
     limit: 100
 }
 
 let marquee = new Marquee(marqueeProperies);
+marquee.load();
 window.addEventListener('resize', (event) => {
     marquee = new Marquee(marqueeProperies);
+    marquee.load();
 })

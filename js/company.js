@@ -86,10 +86,8 @@ class Company {
     
     async getStockHistory(url) {
         try {
-            // console.log('url:', url);
             const response = await fetch(url);
             const stockHistoryData = await response.json();
-            // console.log('stockHistoryData: ', stockHistoryData);
             return stockHistoryData;
         } catch(error) {
             console.log('error inside getStockHistory:', error);
@@ -108,17 +106,6 @@ class Company {
     }
 
     renderHistoryChart(history) {        
-        // let dates = [];
-        // let prices = [];
-        // history.forEach((item) => {
-        //     const {date} = item;
-        //     dates.push(date);
-        //     const {close} = item;
-        //     prices.push(close);
-        // });
-        // console.log('dates', dates);
-        // console.log('prices', prices);
-        
         const chartContext = document.getElementById('myChart').getContext('2d');
         const chartConfig = {
             type: 'line',
@@ -164,8 +151,6 @@ class Company {
         document.getElementById('error-loading').classList.remove('d-none');
     }
 }
-
-
 
 
 window.onload = () => {
