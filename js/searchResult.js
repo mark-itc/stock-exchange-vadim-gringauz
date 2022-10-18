@@ -7,38 +7,22 @@
 export class SearchResult {
     constructor(container) {
         this.container = container
-        this.searchedTerm = "";
         this.#init();
     }
 
     async #init() {
         await this.renderHTML();
-        this.tableBody = document.getElementById('result-table-body');
-
-        document.addEventListener('resetResults', (event) => {
-            document.getElementById('search-results').classList.add('d-none');
-            this.reset();
-        });
-
-        document.addEventListener('renderResults', async(event) => {
-            if (event.detail.length === 0) {
-                document.getElementById('search-not-found').classList.remove('d-none');
-            } else {
-                this.searchedTerm = event.detail.searchedTerm;
-                await this.renderResults(event.detail.results);
-                document.getElementById('search-results').classList.remove('d-none');
-                this.slideInTable();
-            }
-        });
-        
+        this.tableBody = document.getElementById('result-table-body');        
     }
 
     async renderHTML() {
         const HTML = `
-            <table class="table table-hover table-borderless">
-                <thead></thead>
-                <tbody id="result-table-body"></tbody>
-            </table>
+            <div id="search-found" class="d-none">
+                <table class="table table-hover table-borderless">
+                    <thead></thead>
+                    <tbody id="result-table-body"></tbody>
+                </table>
+            </div>
 
             <template id="search-result-template">
                 <tr id="search-result-">
@@ -85,59 +69,63 @@ export class SearchResult {
                 <div class="col-auto fs-3">Sorry, no match was found</div>
             </div>
         `;
-        document.getElementById('main-container').appendChild(noMatchDiv);
+        this.container.appendChild(noMatchDiv);
     }
 
-    reset() {
+    async reset() {
         document.getElementById('search-not-found').classList.add('d-none');
         this.tableBody.innerHTML = '';
     }
 
-    async renderResults(searchResults) {
-        try {
-            const symbolsFromResults = this.extractSymbols(searchResults);
-            const resultsAdditionalData = await this.getAdditionalData(symbolsFromResults);
-            searchResults.forEach(async(searchResult, index) => {
-                const template = document.getElementById('search-result-template');
-                const clone = template.content.cloneNode(true);
-                clone.getElementById('search-result-').id += index;
-                const a = clone.querySelector('a');
-                a.href = `./company.html?symbol=${searchResult.symbol}`;
-                a.innerHTML = `${this.highlightTerm(this.searchedTerm, searchResult.name)}`;
-                clone.querySelector('.symbol').innerHTML = `(${this.highlightTerm(this.searchedTerm, searchResult.symbol)})`;
-                
-                // LEGACY: previous method
-                // const moreDetails = await this.getCompSpecs(searchResult.symbol);
-                // clone.querySelector('img').src = moreDetails.image;
-                // const changesSpan = clone.querySelector('.changes');
-                // let changesAsPercentage  = parseFloat(moreDetails.changes).toFixed(2);
-    
-                const matchingAdditionalData = resultsAdditionalData.filter(result => result.symbol === searchResult.symbol);
-                const img = clone.querySelector('img');
-                img.src = matchingAdditionalData[0].image;
-                img.addEventListener('error', () => {
-                    console.log('error loading img');
-                    img.src = "https://www.svgrepo.com/show/92170/not-available-circle.svg";
-                });
-                const changesSpan = clone.querySelector('.changes');
-                let changesAsPercentage  = parseFloat(matchingAdditionalData[0].changesPercentage).toFixed(2);
-    
-                // changesAsPercentage *= -1; 
-                if (changesAsPercentage < 0) {
-                    changesSpan.classList.add('text-danger');
-                    changesSpan.innerHTML = `(${changesAsPercentage}%)`;
-                } else if (changesAsPercentage > 0) {
-                    changesSpan.classList.add('text-success');
-                    changesSpan.innerHTML = `(+${changesAsPercentage}%)`;
-                } else {
-                    changesSpan.innerHTML = `(${changesAsPercentage}%)`;
-                }
-                this.tableBody.appendChild(clone);
-            });
-
-        } catch(error) {
-            console.log('Error renderig:', error);
+    async renderResults(searchResults, searchedTerm) {
+        if (searchResults.length === 0) {
+            document.getElementById('search-found').classList.add('d-none');
+            document.getElementById('search-not-found').classList.remove('d-none');
+            return;
         }
+        
+        await this.reset();
+        const symbolsFromResults = this.extractSymbols(searchResults);
+        const resultsAdditionalData = await this.getAdditionalData(symbolsFromResults);
+        searchResults.forEach(async(searchResult, index) => {
+            const template = document.getElementById('search-result-template');
+            const clone = template.content.cloneNode(true);
+            clone.getElementById('search-result-').id += index;
+            const a = clone.querySelector('a');
+            a.href = `./company.html?symbol=${searchResult.symbol}`;
+            a.innerHTML = `${this.highlightTerm(searchedTerm, searchResult.name)}`;
+            clone.querySelector('.symbol').innerHTML = `(${this.highlightTerm(searchedTerm, searchResult.symbol)})`;
+            
+            // LEGACY: previous method
+            // const moreDetails = await this.getCompSpecs(searchResult.symbol);
+            // clone.querySelector('img').src = moreDetails.image;
+            // const changesSpan = clone.querySelector('.changes');
+            // let changesAsPercentage  = parseFloat(moreDetails.changes).toFixed(2);
+
+            const matchingAdditionalData = resultsAdditionalData.filter(result => result.symbol === searchResult.symbol);
+            const img = clone.querySelector('img');
+            img.src = matchingAdditionalData[0].image;
+            img.addEventListener('error', () => {
+                console.log('error loading img');
+                img.src = "https://www.svgrepo.com/show/92170/not-available-circle.svg";
+            });
+            const changesSpan = clone.querySelector('.changes');
+            let changesAsPercentage  = parseFloat(matchingAdditionalData[0].changesPercentage).toFixed(2);
+
+            // changesAsPercentage *= -1; 
+            if (changesAsPercentage < 0) {
+                changesSpan.classList.add('text-danger');
+                changesSpan.innerHTML = `(${changesAsPercentage}%)`;
+            } else if (changesAsPercentage > 0) {
+                changesSpan.classList.add('text-success');
+                changesSpan.innerHTML = `(+${changesAsPercentage}%)`;
+            } else {
+                changesSpan.innerHTML = `(${changesAsPercentage}%)`;
+            }
+            this.tableBody.appendChild(clone);
+        });
+        document.getElementById('search-found').classList.remove('d-none');
+        this.slideInTable();
     }
 
     

@@ -19,12 +19,16 @@ export class SearchForm {
     async #init() {
         await this.renderForm();
         this.searchInput = document.getElementById('search-input');
+        
+        document.addEventListener('turnOffLoading', this.turnOffLoading);
 
         /*RUN SEARCH ON FORM-SUBMIT*/
-        document.getElementById('search-form').addEventListener('submit', async (event) => {
+        document.getElementById('search-form').addEventListener('submit', async(event) => {
             event.preventDefault();
             if (!this.isSearching) {
-                this.runSearch(this.searchInput.value);
+                this.isSearching = true;
+                const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
+                document.dispatchEvent(runSearchEvent);
             }
         });
 
@@ -61,31 +65,28 @@ export class SearchForm {
         if (searchQuery) {
             this.searchInput.value = searchQuery;
             this.runSearch(searchQuery);
-        }  
+            const runSearchEvent = new CustomEvent("runSearch", {detail: {term: searchQuery}});
+            document.dispatchEvent(runSearchEvent);
+        }
     }
 
     async runSearch(searchTerm) {
         try {
             console.log('start of sreach for term=', searchTerm);
             this.turnOnLoading();
-            const resetResults = new CustomEvent("resetResults");
-            document.dispatchEvent(resetResults);
-            
+            this.modifyLocationQuery(searchTerm);
             const endpointURL = `
                 ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
             `;
-            this.modifyLocationQuery(searchTerm);
             const searchResults = await this.getSearchResults(endpointURL);
-            const renderResults = new CustomEvent("renderResults", {
-                detail: {
-                    results: searchResults,
-                    searchedTerm: searchTerm
-                }
-            });
-            document.dispatchEvent(renderResults);
+            return searchResults;            
         } catch(error) {
             console.log('Error caught inside runSearch', error);
-        } finally {this.turnOffLoading();}
+            return [];
+        } finally {
+            this.isSearching = false;
+            this.turnOffLoading();
+        }
     }
 
     async getSearchResults(url) {
@@ -107,7 +108,9 @@ export class SearchForm {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 if (!this.isSearching) {
-                    this.runSearch(this.searchInput.value);
+                    this.isSearching = true;
+                    const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
+                    document.dispatchEvent(runSearchEvent);
                 }
             }, timeToWait); 
         }
@@ -125,17 +128,22 @@ export class SearchForm {
 
 
     turnOnLoading() {
-        this.isSearching = true;
         document.getElementById('search-button').classList.add('disabled');
         document.getElementById('search-spinner').classList.remove('d-none');
         document.getElementById('search-button-text').innerHTML = "Searching...";
     }
 
     turnOffLoading() {
-        this.isSearching = false;
         document.getElementById('search-button').classList.remove('disabled');
         document.getElementById('search-spinner').classList.add('d-none');
         document.getElementById('search-button-text').innerHTML = "Search";
+    }
+
+    onSearch(renderResults) {
+        document.addEventListener('runSearch', async(event) => {
+            const resultsFromSearch = await this.runSearch(event.detail.term);
+            renderResults(resultsFromSearch, event.detail.term);
+        });
     }
 }
 

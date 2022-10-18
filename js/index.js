@@ -29,4 +29,10 @@ window.onload = async() => {
     
     results = new SearchResult(document.getElementById('search-results'));
     form = new SearchForm(document.getElementById('form'));
+
+    // 'searchedTerm' IS NEEDED FOR results.highLight METHOD
+    form.onSearch((companies, searchedTerm) => {
+        results.renderResults(companies, searchedTerm)
+    });
+    
 }

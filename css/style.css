@@ -1,3 +1,9 @@
+mark {
+    padding: 0;
+    background-color: yellow;
+    color: inherit;
+}
+
 .spinner-container {
     width: 100vw;
     height: 100vh;
@@ -39,6 +45,7 @@ tr {
 
 .move.first {
     animation: scroll-left-from-left 100s linear infinite;
+    user-select: none;
 }
 .move.first:hover {
     animation-play-state: paused;
@@ -46,6 +53,7 @@ tr {
 
 .move.second {
     animation: scroll-left-from-right 100s linear infinite;
+    user-select: none;
 }
 .move.second:hover {
     animation-play-state: paused;
