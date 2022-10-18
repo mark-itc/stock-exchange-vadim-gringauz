@@ -51,11 +51,18 @@ tr {
     animation-play-state: paused;
 }
 
+.move.first:hover ~ .second {
+    animation-play-state: paused;
+}
+
 .move.second {
     animation: scroll-left-from-right 100s linear infinite;
     user-select: none;
 }
 .move.second:hover {
+    animation-play-state: paused;
+}
+.move.second:hover ~ .first {
     animation-play-state: paused;
 }
 

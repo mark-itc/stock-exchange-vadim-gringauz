@@ -72,14 +72,29 @@ export class SearchForm {
 
     async runSearch(searchTerm) {
         try {
-            console.log('start of sreach for term=', searchTerm);
+            console.log('start of search for term=', searchTerm);
             this.turnOnLoading();
             this.modifyLocationQuery(searchTerm);
+            if (searchTerm.length === 0) {return [];}
+
             const endpointURL = `
                 ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
             `;
             const searchResults = await this.getSearchResults(endpointURL);
-            return searchResults;            
+            // console.log('searchResults=', searchResults);
+            
+            // GET ADDITIONAL DATA (IMG+PRICE) FOR EACH COMPANY
+            const symbolsFromResults = this.extractSymbols(searchResults);
+            const resultsOnlyAdditionalData = await this.getAdditionalData(symbolsFromResults);
+            const searchResultsFullData = [];
+            searchResults.forEach((result, index) => {
+                const newResult = {
+                    ...result,
+                    ...resultsOnlyAdditionalData[index]
+                };
+                searchResultsFullData.push(newResult);
+            });
+            return searchResultsFullData;            
         } catch(error) {
             console.log('Error caught inside runSearch', error);
             return [];
@@ -100,6 +115,107 @@ export class SearchForm {
             return;
         } 
     }
+
+    async getMultipleCompanyProfiles(partialProfiles, symbols) {
+        try {
+            let url = "https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/";
+            const symbolsString = symbols.toString();
+            url += symbolsString;
+            const response = await fetch(url);
+            const data = await response.json();
+            // console.log('data', data);
+            
+            if (symbols.length === 1) {
+                if (data.symbol) {
+                    const companySpecs = {
+                        symbol: data.symbol,
+                        image: data.profile.image,
+                        changesPercentage: data.profile.changesPercentage
+                    }
+                    partialProfiles.push(companySpecs);
+                    return partialProfiles;
+                } else {
+                    /* SOME COMPANY SYMBOLS RETURN EMPTY OBJECT FROM 'COMPANY-DATA' ENDPOINT */
+                    return [{
+                        symbol: symbols[0],
+                        image: "https://cdn-icons-png.flaticon.com/512/16/16096.png",
+                        changesPercentage: 0
+                       
+                    }];
+                }
+                
+            }
+            const fixedData = this.compensateMissingProfile(symbols, data);
+            fixedData.companyProfiles.forEach((profile) => {
+                const companySpecs = {
+                    symbol: profile.symbol,
+                    image: profile.profile.image,
+                    changesPercentage: profile.profile.changesPercentage
+                }
+                partialProfiles.push(companySpecs);
+            });
+            return partialProfiles;
+        } catch(error) {
+            console.log('error inside get Multiple Company Profiles:', error);
+            return;
+        } 
+    }
+
+    async getAdditionalData(allResultSymbols) {
+        let partialProfiles = [];
+        let removedSymbols;
+        while (allResultSymbols.length > 0) {
+            removedSymbols = allResultSymbols.splice(0,3);
+            partialProfiles = await this.getMultipleCompanyProfiles(partialProfiles, removedSymbols);
+        }
+        return partialProfiles;
+    }
+
+    extractSymbols(searchResults) {
+        let symbols = searchResults.map(({ symbol }) => symbol)
+        return symbols;
+    }
+
+    /* SOME COMPANY SYMBOLS RETURN EMPTY OBJECT FROM 'COMPANY-DATA' ENDPOINT */
+    compensateMissingProfile(symbols, data) {
+        if (symbols.length === data.companyProfiles.length) {
+            /* NO NEED TO COMPENSATE */
+            return data;
+        } else {
+            symbols.forEach((symbol) => {
+                if (!data.companyProfiles.find(element => element.symbol === symbol)) {
+                    console.log('does not exist:', symbol);
+                    const missingProfile = {
+                        symbol: symbol,
+                        profile: {
+                            image: "https://cdn-icons-png.flaticon.com/512/16/16096.png",
+                            changesPercentage: 0
+                        }
+                    };
+                    data.companyProfiles.push(missingProfile);
+                }
+            });
+            return data;
+        }
+    }
+
+    // LEGACY: previous method
+    // async getCompSpecs(symbol) {
+    //     try {
+    //         const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/${symbol}`;
+    //         const response = await fetch(url);
+    //         const companyProfileData = await response.json();
+    //         // console.log('companyProfileData: ', companyProfileData);
+    //         return {
+    //             image: companyProfileData.profile.image,
+    //             changes: companyProfileData.profile.changes
+    //         };
+    //     } catch(error) {
+    //         console.log('error inside getCompSpecs:', error);
+    //         return;
+    //     } 
+    // }
+
 
     debounceSearch(timeToWait) {
         let timeout;
