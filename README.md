@@ -1,4 +1,4 @@
-## :chart_with_downwards_trend: JS Project #2: Stock Exchange
+## JS Project #2: :chart_with_downwards_trend: Stock Exchange
 # Milestone :seven: v1.0 
 ## Ready for Review (Only when in main branch!)
 ### *Progress:*
