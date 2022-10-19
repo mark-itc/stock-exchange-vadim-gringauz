@@ -1,2 +1,10 @@
-search LCY -> LCYAW??
+1. search LCY -> LCYAW??
 open company with LCYAW
+
+2. Milestone 7:
+search aa
+search AA
+search Aa
+search aA
+
+3. search "#"

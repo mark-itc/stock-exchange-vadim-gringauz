@@ -26,7 +26,7 @@ export class SearchForm {
         document.getElementById('search-form').addEventListener('submit', async(event) => {
             event.preventDefault();
             if (!this.isSearching) {
-                this.isSearching = true;
+                this.disableSearch();
                 const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
                 document.dispatchEvent(runSearchEvent);
             }
@@ -63,8 +63,8 @@ export class SearchForm {
         const urlParams = new URLSearchParams(location.search)
         const searchQuery = urlParams.get("query");
         if (searchQuery) {
+            this.disableSearch();
             this.searchInput.value = searchQuery;
-            this.runSearch(searchQuery);
             const runSearchEvent = new CustomEvent("runSearch", {detail: {term: searchQuery}});
             document.dispatchEvent(runSearchEvent);
         }
@@ -75,7 +75,8 @@ export class SearchForm {
             console.log('start of search for term=', searchTerm);
             this.turnOnLoading();
             this.modifyLocationQuery(searchTerm);
-            if (searchTerm.length === 0) {return [];}
+            // ADDED SIMPLE REGEX VALIDATION FOR SOME PROBLEMATIC INPUTS (#,^,&...)
+            if (searchTerm.length === 0 || /[^A-Za-z0-9]+/g.test(searchTerm)) {return [];}
 
             const endpointURL = `
                 ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
@@ -83,25 +84,34 @@ export class SearchForm {
             const searchResults = await this.getSearchResults(endpointURL);
             // console.log('searchResults=', searchResults);
             
-            // GET ADDITIONAL DATA (IMG+PRICE) FOR EACH COMPANY
-            const symbolsFromResults = this.extractSymbols(searchResults);
-            const resultsOnlyAdditionalData = await this.getAdditionalData(symbolsFromResults);
-            const searchResultsFullData = [];
-            searchResults.forEach((result, index) => {
-                const newResult = {
-                    ...result,
-                    ...resultsOnlyAdditionalData[index]
-                };
-                searchResultsFullData.push(newResult);
-            });
-            return searchResultsFullData;            
+            return await this.addImageAndPrice(searchResults);            
         } catch(error) {
             console.log('Error caught inside runSearch', error);
             return [];
         } finally {
-            this.isSearching = false;
+            this.enableSearch();
             this.turnOffLoading();
         }
+    }
+
+    async addImageAndPrice(searchResults) {
+        const resultsWithImageAndPrice = [];
+        const symbolsFromResults = this.extractSymbols(searchResults);
+        const resultsOnlyAdditionalData = await this.getAdditionalData(symbolsFromResults);
+        
+        searchResults.forEach((result, index) => {
+            const img = resultsOnlyAdditionalData.filter(item => item.symbol == result.symbol)[0].image;
+            const price = resultsOnlyAdditionalData.filter(item => item.symbol == result.symbol)[0].changesPercentage;
+            const newResult = {
+                ...result,
+                image: img,
+                changesPercentage: price
+            };
+            resultsWithImageAndPrice.push(newResult);
+        });        
+
+
+        return resultsWithImageAndPrice
     }
 
     async getSearchResults(url) {
@@ -199,24 +209,6 @@ export class SearchForm {
         }
     }
 
-    // LEGACY: previous method
-    // async getCompSpecs(symbol) {
-    //     try {
-    //         const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/${symbol}`;
-    //         const response = await fetch(url);
-    //         const companyProfileData = await response.json();
-    //         // console.log('companyProfileData: ', companyProfileData);
-    //         return {
-    //             image: companyProfileData.profile.image,
-    //             changes: companyProfileData.profile.changes
-    //         };
-    //     } catch(error) {
-    //         console.log('error inside getCompSpecs:', error);
-    //         return;
-    //     } 
-    // }
-
-
     debounceSearch(timeToWait) {
         let timeout;
     
@@ -224,7 +216,7 @@ export class SearchForm {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
                 if (!this.isSearching) {
-                    this.isSearching = true;
+                    this.disableSearch();
                     const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
                     document.dispatchEvent(runSearchEvent);
                 }
@@ -241,8 +233,6 @@ export class SearchForm {
         window.history.replaceState(nextState, nextTitle, nextURL);
     }
 
-
-
     turnOnLoading() {
         document.getElementById('search-button').classList.add('disabled');
         document.getElementById('search-spinner').classList.remove('d-none');
@@ -253,6 +243,17 @@ export class SearchForm {
         document.getElementById('search-button').classList.remove('disabled');
         document.getElementById('search-spinner').classList.add('d-none');
         document.getElementById('search-button-text').innerHTML = "Search";
+    }
+
+    disableSearch() {
+        this.isSearching = true;
+        document.getElementById('search-input').disabled = true;
+    }
+
+    enableSearch() {
+        this.isSearching = false;
+        document.getElementById('search-input').disabled = false;
+        document.getElementById('search-input').focus();
     }
 
     onSearch(renderResults) {
