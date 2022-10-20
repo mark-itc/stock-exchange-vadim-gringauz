@@ -6,11 +6,11 @@
 import {Marquee} from "./marquee.js";
 import {SearchResult} from "./searchResult.js";
 import {SearchForm} from "./searchForm.js";
+import { Darkmode } from "./darkmode.js";
 
 
 let form = {};
 let results = {};
-
 
 window.onload = async() => { 
     const marqueeProperies = {
@@ -22,10 +22,10 @@ window.onload = async() => {
     
     let marquee = new Marquee(marqueeProperies);
     marquee.load();
-    window.addEventListener('resize', (event) => {
-        marquee = new Marquee(marqueeProperies);
-        marquee.load();
-    });
+    // window.addEventListener('resize', (event) => {
+    //     marquee = new Marquee(marqueeProperies);
+    //     marquee.load();
+    // });
     
     results = new SearchResult(document.getElementById('search-results'));
     form = new SearchForm(document.getElementById('form'));
@@ -34,5 +34,10 @@ window.onload = async() => {
     form.onSearch((companies, searchedTerm) => {
         results.renderResults(companies, searchedTerm)
     });
+    
+    // DARK-MODE
+    
+    
+   const darkmode = new Darkmode(document.getElementById('nav'));
     
 }

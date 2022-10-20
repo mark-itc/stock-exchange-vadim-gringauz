@@ -12,7 +12,7 @@ export class Marquee {
     }
     
     async load() {
-        this.renderContainers();
+        await this.renderContainers();
         this.container.classList.remove('d-none');
         this.renderData(await this.getData(this.limit));
     }
@@ -29,7 +29,7 @@ export class Marquee {
         }
     }
 
-    renderContainers() {
+    async renderContainers() {
         const HTML = `
             <div id="marquee-container-a" class="move first d-flex flex-nowrap"></div>
             <div id="marquee-container-b" class="move second d-flex flex-nowrap"></div>

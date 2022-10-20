@@ -1,3 +1,24 @@
+* {
+    --main-bg-color: white;
+    --main-text-color: black;
+}
+
+.darkmode {
+    --main-bg-color: black;
+    --main-text-color: white;
+}
+
+
+.darkmode-btn {
+    height: 20px;
+    font-size: 0.7rem;
+    padding: 0;
+}
+
+body {
+    background: var(--main-bg-color);
+    color: var(--main-text-color);
+}
 mark {
     padding: 0;
     background-color: yellow;
@@ -29,7 +50,6 @@ tr {
     height: 50px;
     overflow: hidden;
     position: relative;
-    /* background: #fefefe; */
     color: #333;
     border-bottom: 1px solid black;
 }

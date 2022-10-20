@@ -1,4 +1,4 @@
-// import Chart from 'chart.js/auto';
+import { Darkmode } from "./darkmode.js";
 
 class Company {
     constructor(symbol) {
@@ -159,4 +159,6 @@ window.onload = () => {
     const company = new Company(symbol);
 
     document.getElementById('back-to-search').href = document.referrer;
+
+    const darkmode = new Darkmode(document.getElementById('nav'));
 }
