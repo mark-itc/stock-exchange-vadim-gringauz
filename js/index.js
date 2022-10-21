@@ -3,9 +3,9 @@
 *                  index.js:                   *
 *          index.html onLoad script            *
 * **********************************************/
-import {Marquee} from "./marquee.js";
-import {SearchResult} from "./searchResult.js";
-import {SearchForm} from "./searchForm.js";
+import { Marquee } from "./marquee.js";
+import { SearchResult } from "./searchResult.js";
+import { SearchForm } from "./searchForm.js";
 import { Darkmode } from "./darkmode.js";
 
 
@@ -21,12 +21,7 @@ window.onload = async() => {
     }
     
     let marquee = new Marquee(marqueeProperies);
-    marquee.load();
-    // window.addEventListener('resize', (event) => {
-    //     marquee = new Marquee(marqueeProperies);
-    //     marquee.load();
-    // });
-    
+    marquee.load(); 
     results = new SearchResult(document.getElementById('search-results'));
     form = new SearchForm(document.getElementById('form'));
 
@@ -35,9 +30,9 @@ window.onload = async() => {
         results.renderResults(companies, searchedTerm)
     });
     
-    // DARK-MODE
+    const darkmode = new Darkmode(document.getElementById('nav'));
     
-    
-   const darkmode = new Darkmode(document.getElementById('nav'));
-    
+    // form.onSearch((companies, searchedTerm) => {
+    //     results.renderResults(companies, searchedTerm)
+    // });
 }

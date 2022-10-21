@@ -1,23 +1,22 @@
 import { Darkmode } from "./darkmode.js";
 
 class Company {
-    constructor(symbol) {
-        this.symbol = symbol;
-
+    constructor(container) {
+        this.container = container;
         this.#init();
     }
 
     async #init() {
         try {
+            await this.renderFrame();
             this.turnOnLoading();
-            const profile = await this.getProfile(this.symbol);
-            const stockHistoryEndpoint = 
-                `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/historical-price-full/${this.symbol}?serietype=line`;
-            const stockHistory = await this.getStockHistory(stockHistoryEndpoint);
-
+            this.symbol = this.getSymbolFromURL();
+            const profile = await this.getProfile(this.symbol);                
             this.renderProfile(profile);
-
+            const stockHistory = await this.getStockHistory(this.symbol);
             this.renderHistoryChart(stockHistory);
+
+
         } catch(error) {
             console.log('error inside init:', error);
             this.renderError();
@@ -26,6 +25,67 @@ class Company {
             this.turnOffLoading();
         }
 
+    }
+    
+    getSymbolFromURL() {
+        const urlParams = new URLSearchParams(location.search)
+        return urlParams.get("symbol"); 
+    }
+    
+    async renderFrame() {
+        const HTML = `
+            <!-- Preloading Spinner -->
+            <div id="preloader" class="spinner-container d-flex align-items-center d-none">
+                <div class="text-center w-100">
+                    <div class="spinner-border text-danger" style="width: 10rem; height: 10rem;" role="status">
+                        <span class="visually-hidden"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Error notification -->
+            <div id="error-loading" class="alert alert-danger d-flex align-items-center d-none" role="alert">
+                <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                <div>
+                Error Loading: Invalid Company Symbol
+                </div>
+            </div>
+
+            <!-- Main Container -->
+            <div id="company-container" class="container-fluid custom-width">
+                <h1 class="text-center">Company Profile</h1>
+                <div class="row justify-content-center">
+                    <div id="symbol" class="col col-auto fs-2 text-center">[symbol]</div>
+                </div>
+                <div class="row justify-content-between align-items-center">
+                    <div class="col-auto">
+                        <a id="name" href="" target="_blank" class="text-danger display-6 text-align-middle">[Name]</a>
+                        <!-- <h2 id="name" class="text-danger text-align-middle">[Name]</h2> -->
+                    </div>
+                    <div class="col-auto">
+                        <img id="image" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="$name + logo" style="max-height: 150px;">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col col-auto">
+                        <div id="description" class="row">[Description]</div>
+                    </div>
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-auto fs-2">Stock Price:</div>
+                    <div id="price" class="col-auto fs-2">[Stock Price]</div>
+                    <div id="change" class="col-auto fw-bolder fs-3">[stock changes Percentage]</div>
+                </div>
+                <div id="chart-container" class="row">
+                    <div class="col-12">
+                        <canvas id="myChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        `;
+        const frameDiv = document.createElement('div');
+        frameDiv.innerHTML = HTML;
+        document.body.appendChild(frameDiv);
     }
 
     async getProfile(symbol) {
@@ -84,8 +144,9 @@ class Company {
         }
     }
     
-    async getStockHistory(url) {
+    async getStockHistory(symbol) {
         try {
+            const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/historical-price-full/${symbol}?serietype=line`;
             const response = await fetch(url);
             const stockHistoryData = await response.json();
             return stockHistoryData;
@@ -154,11 +215,8 @@ class Company {
 
 
 window.onload = () => {
-    const urlParams = new URLSearchParams(location.search)
-    const symbol = urlParams.get("symbol"); 
-    const company = new Company(symbol);
-
     document.getElementById('back-to-search').href = document.referrer;
-
+    
+    const company = new Company(document.body);
     const darkmode = new Darkmode(document.getElementById('nav'));
 }

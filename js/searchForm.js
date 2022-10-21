@@ -27,8 +27,11 @@ export class SearchForm {
             event.preventDefault();
             if (!this.isSearching) {
                 this.disableSearch();
-                const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
-                document.dispatchEvent(runSearchEvent);
+                this.runSearch(this.searchInput.value);
+                
+                // const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
+                // document.dispatchEvent(runSearchEvent);
+                // this.renderResults();
             }
         });
 
@@ -65,18 +68,20 @@ export class SearchForm {
         if (searchQuery) {
             this.disableSearch();
             this.searchInput.value = searchQuery;
-            const runSearchEvent = new CustomEvent("runSearch", {detail: {term: searchQuery}});
-            document.dispatchEvent(runSearchEvent);
+            this.runSearch(searchQuery);
+            // const runSearchEvent = new CustomEvent("runSearch", {detail: {term: searchQuery}});
+            // document.dispatchEvent(runSearchEvent);
         }
     }
 
     async runSearch(searchTerm) {
         try {
+            if (searchTerm.length === 0) {return;}
             console.log('start of search for term=', searchTerm);
             this.turnOnLoading();
             this.modifyLocationQuery(searchTerm);
             // ADDED SIMPLE REGEX VALIDATION FOR SOME PROBLEMATIC INPUTS (#,^,&...)
-            if (searchTerm.length === 0 || /[^A-Za-z0-9]+/g.test(searchTerm)) {return [];}
+            if (/[^A-Za-z0-9]+/g.test(searchTerm)) {this.renderResults([]);}
 
             const endpointURL = `
                 ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
@@ -84,10 +89,11 @@ export class SearchForm {
             const searchResults = await this.getSearchResults(endpointURL);
             // console.log('searchResults=', searchResults);
             
-            return await this.addImageAndPrice(searchResults);            
+            this.renderResults(await this.addImageAndPrice(searchResults) ,searchTerm);
+            // return await this.addImageAndPrice(searchResults);            
         } catch(error) {
             console.log('Error caught inside runSearch', error);
-            return [];
+            // return [];
         } finally {
             this.enableSearch();
             this.turnOffLoading();
@@ -217,8 +223,9 @@ export class SearchForm {
             timeout = setTimeout(() => {
                 if (!this.isSearching) {
                     this.disableSearch();
-                    const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
-                    document.dispatchEvent(runSearchEvent);
+                    this.runSearch(this.searchInput.value);
+                    // const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
+                    // document.dispatchEvent(runSearchEvent);
                 }
             }, timeToWait); 
         }
@@ -257,11 +264,15 @@ export class SearchForm {
     }
 
     onSearch(renderResults) {
-        document.addEventListener('runSearch', async(event) => {
-            const resultsFromSearch = await this.runSearch(event.detail.term);
-            renderResults(resultsFromSearch, event.detail.term);
-        });
+        this.renderResults = renderResults;
     }
+
+    // onSearch(renderResults) {
+    //     document.addEventListener('runSearch', async(event) => {
+    //         const resultsFromSearch = await this.runSearch(event.detail.term);
+    //         renderResults(resultsFromSearch, event.detail.term);
+    //     });
+    // }
 }
 
 
