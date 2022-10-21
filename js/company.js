@@ -33,7 +33,7 @@ class Company {
     }
     
     async renderFrame() {
-        const HTML = `
+        const spinnerDivHTML = `
             <!-- Preloading Spinner -->
             <div id="preloader" class="spinner-container d-flex align-items-center d-none">
                 <div class="text-center w-100">
@@ -42,7 +42,8 @@ class Company {
                     </div>
                 </div>
             </div>
-            
+        `;
+        const errorDivHTML = `
             <!-- Error notification -->
             <div id="error-loading" class="alert alert-danger d-flex align-items-center d-none" role="alert">
                 <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
@@ -50,9 +51,10 @@ class Company {
                 Error Loading: Invalid Company Symbol
                 </div>
             </div>
-
+        `;
+        const mainContainerHTML = `
             <!-- Main Container -->
-            <div id="company-container" class="container-fluid custom-width">
+            <div id="company-container" class="container-fluid custom-width p-3">
                 <h1 class="text-center">Company Profile</h1>
                 <div class="row justify-content-center">
                     <div id="symbol" class="col col-auto fs-2 text-center">[symbol]</div>
@@ -84,7 +86,7 @@ class Company {
             </div>
         `;
         const frameDiv = document.createElement('div');
-        frameDiv.innerHTML = HTML;
+        frameDiv.innerHTML = spinnerDivHTML + errorDivHTML + mainContainerHTML;
         document.body.appendChild(frameDiv);
     }
 

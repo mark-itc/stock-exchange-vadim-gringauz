@@ -11,54 +11,48 @@ export class SearchResult {
     }
 
     async #init() {
-        await this.renderHTML();
-        this.tableBody = document.getElementById('result-table-body');        
+        await this.renderHTML();     
     }
 
     async renderHTML() {
-        const HTML = `
+        const divsHTML = `
             <div id="search-found" class="d-none">
+
+
+            <!--
                 <table class="table table-hover table-borderless">
                     <thead></thead>
                     <tbody id="result-table-body"></tbody>
                 </table>
+            -->
             </div>
+            
 
             <div id="search-error-msg"></div>
-
+        `;
+        const templateHTML = `
             <template id="search-result-template">
-                <tr id="search-result-">
-                    <th scope="row"></th>
-                    <td class="">
-                        <div class="row custom-height">
-                            <div class="col-auto g-1">
-                                <img  style="height: 30px;" class="img-thumbnail" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="">
-                            </div>
+                <div id="search-result-" class="d-flex flex-row result-row justify-content-between align-items-end pt-2 overflow-visible">
+                    <div class="d-flex flex-row align-items-end">
+                        <div>
+                            <img  style="height: 30px;" class="img-thumbnail" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="">
                         </div>
-                    </td>
-                    <td class="overflow-hidden">
-                        <div class="row custom-height align-items-end">
-                            <div class="col-auto">
-                                <a class="fs-4" href="">[Name]</a>
-                                <span class="symbol text-secondary">([Symbol])</span>
-                            </div>
-                            <div class="col-auto">
-                            </div>
-                            <div class="col-auto">
-                            </div>
+                        <div class="ms-2" style="height: 33px;">
+                            <a class="fs-4 overflow-hidden text-nowrap" href="">[Name]</a>
                         </div>
-                    </td>
-                    <td>
-                        <div class="row custom-height align-items-end">
-                            <div class="col-auto mt-2">
-                                <span class="changes">([changes])</span>
-                            </div>
+                        <div class="ms-2">
+                            <span class="symbol text-secondary">([Symbol])</span>
                         </div>
-                    </td>
-                </tr>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div>
+                            <span class="changes">([changes])</span>
+                        </div>
+                    </div>
+                </div>
             </template>
         `;
-        this.container.innerHTML = HTML;
+        this.container.innerHTML = divsHTML + templateHTML;
         
         const noMatchDiv = document.createElement('div');
         noMatchDiv.id = "search-not-found";
@@ -80,14 +74,14 @@ export class SearchResult {
 
     async reset() {
         this.foundDiv.classList.add('d-none');
-        this.tableBody.innerHTML = '';
+        this.foundDiv.innerHTML = '';
         this.notFoundDiv.classList.add('d-none');
         this.errorMsgDiv.classList.add('d-none');
         this.errorMsgDiv.innerHTML = "";
     }
 
     async renderResults(searchResults, searchedTerm) {
-        console.log('searchResults=', searchResults, "searchedTerm", searchedTerm);
+        // console.log('searchResults=', searchResults, "searchedTerm", searchedTerm);
         await this.reset();
         
         if (searchResults.length === 0) {
@@ -126,7 +120,7 @@ export class SearchResult {
                 } else {
                     changesSpan.innerHTML = `(${changesAsPercentage}%)`;
                 }
-                this.tableBody.appendChild(clone);
+                this.foundDiv.appendChild(clone);
             });
             this.foundDiv.classList.remove('d-none');
             this.slideInTable();
@@ -134,7 +128,7 @@ export class SearchResult {
     }
 
     slideInTable() {
-        const rows = Array.from(document.querySelectorAll('tr'));
+        const rows = Array.from(document.querySelectorAll('.result-row'));
 
         function slideOut(row) {
           row.classList.add('slide-out');

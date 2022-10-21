@@ -10,56 +10,29 @@ export class SearchForm {
         this.endPoint = 'https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/search';
         this.limit = 10;
         this.exchange = 'NASDAQ';
-        this.searchInput = {};   // maybe can delete this
         this.isSearching = false;
-
         this.#init();
     }
 
     async #init() {
         await this.renderForm();
         this.searchInput = document.getElementById('search-input');
-        
-        document.addEventListener('turnOffLoading', this.turnOffLoading);
 
-        /*RUN SEARCH ON FORM-SUBMIT*/
+        /* RUN SEARCH ON FORM-SUBMIT */
         document.getElementById('search-form').addEventListener('submit', async(event) => {
             event.preventDefault();
             if (!this.isSearching) {
                 this.disableSearch();
                 this.runSearch(this.searchInput.value);
-                
-                // const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
-                // document.dispatchEvent(runSearchEvent);
-                // this.renderResults();
             }
         });
 
-        /*RUN SEARCH AUTOMATICALLY ON TYPING (WITH DELAY!)*/
+        /* RUN SEARCH AUTOMATICALLY ON TYPING (WITH DELAY! )*/
         const autoSearch = this.debounceSearch(500);
         this.searchInput.addEventListener('input', autoSearch);
 
-        /*RUN SEARCH ON PAGE-LOAD IF THERE ARE PARAMS IN URL*/
+        /* RUN SEARCH ON PAGE-LOAD IF THERE ARE PARAMS IN URL */
         this.runSearchFromUrlParams();
-    }
-
-    async renderForm() {
-        const HTML = `
-            <form class="" id="search-form" role="search">
-                <div class="row justify-content-evenly m-3 g-0">
-                    <div class="col-9">
-                        <input id="search-input" class="form-control w-100 me-2" type="search" placeholder="Search Company" aria-label="Search" spellcheck="false">
-                    </div>
-                    <div class="col-auto">
-                        <button id="search-button" class="btn btn-outline-dark" style="width: 130px" type="submit">
-                            <span id="search-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
-                            <span id="search-button-text">Search</span>
-                        </button>
-                    </div>
-                </div>
-            </form>
-        `;
-        this.container.innerHTML = HTML;
     }
 
     runSearchFromUrlParams() {
@@ -69,35 +42,89 @@ export class SearchForm {
             this.disableSearch();
             this.searchInput.value = searchQuery;
             this.runSearch(searchQuery);
-            // const runSearchEvent = new CustomEvent("runSearch", {detail: {term: searchQuery}});
-            // document.dispatchEvent(runSearchEvent);
         }
     }
 
     async runSearch(searchTerm) {
         try {
             if (searchTerm.length === 0) {return;}
-            console.log('start of search for term=', searchTerm);
+
+            console.log('starting search for term=', searchTerm);
             this.turnOnLoading();
             this.modifyLocationQuery(searchTerm);
-            // ADDED SIMPLE REGEX VALIDATION FOR SOME PROBLEMATIC INPUTS (#,^,&...)
+            /* ADDED SIMPLE REGEX VALIDATION FOR SOME PROBLEMATIC INPUTS (#,^,&...) */
             if (/[^A-Za-z0-9]+/g.test(searchTerm)) {this.renderResults([]);}
 
-            const endpointURL = `
-                ${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}
-            `;
+            const endpointURL = `${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}`;
             const searchResults = await this.getSearchResults(endpointURL);
             // console.log('searchResults=', searchResults);
-            
-            this.renderResults(await this.addImageAndPrice(searchResults) ,searchTerm);
-            // return await this.addImageAndPrice(searchResults);            
+            this.renderResults(await this.addImageAndPrice(searchResults) ,searchTerm);         
         } catch(error) {
             console.log('Error caught inside runSearch', error);
-            // return [];
         } finally {
             this.enableSearch();
             this.turnOffLoading();
         }
+    }
+
+    async getSearchResults(url) {
+        try {
+            const response = await fetch(url);
+            const allSearchResults = await response.json();
+            // console.log('allSearchResults: ', allSearchResults);
+            return allSearchResults;
+        } catch(error) {
+            console.log('error:', error);
+            return;
+        } 
+    }
+
+    debounceSearch(timeToWait) {
+        let timeout;
+    
+        return () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                if (!this.isSearching) {
+                    this.disableSearch();
+                    this.runSearch(this.searchInput.value);
+                    // const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
+                    // document.dispatchEvent(runSearchEvent);
+                }
+            }, timeToWait); 
+        }
+    }
+
+    modifyLocationQuery(searchTerm) {
+        const urlParams = new URLSearchParams(location.search)
+        urlParams.set('query', searchTerm);        
+        const nextURL = location.origin + location.pathname + '?' + urlParams.toString();
+        const nextState = { additionalInformation: '' };
+        const nextTitle = "Stock Exchange Project"
+        window.history.replaceState(nextState, nextTitle, nextURL);
+    }
+
+    turnOnLoading() {
+        document.getElementById('search-button').classList.add('disabled');
+        document.getElementById('search-spinner').classList.remove('d-none');
+        document.getElementById('search-button-text').innerHTML = "Searching...";
+    }
+
+    turnOffLoading() {
+        document.getElementById('search-button').classList.remove('disabled');
+        document.getElementById('search-spinner').classList.add('d-none');
+        document.getElementById('search-button-text').innerHTML = "Search";
+    }
+
+    disableSearch() {
+        this.isSearching = true;
+        document.getElementById('search-input').disabled = true;
+    }
+
+    enableSearch() {
+        this.isSearching = false;
+        document.getElementById('search-input').disabled = false;
+        document.getElementById('search-input').focus();
     }
 
     async addImageAndPrice(searchResults) {
@@ -118,18 +145,6 @@ export class SearchForm {
 
 
         return resultsWithImageAndPrice
-    }
-
-    async getSearchResults(url) {
-        try {
-            const response = await fetch(url);
-            const allSearchResults = await response.json();
-            // console.log('allSearchResults: ', allSearchResults);
-            return allSearchResults;
-        } catch(error) {
-            console.log('error:', error);
-            return;
-        } 
     }
 
     async getMultipleCompanyProfiles(partialProfiles, symbols) {
@@ -215,64 +230,26 @@ export class SearchForm {
         }
     }
 
-    debounceSearch(timeToWait) {
-        let timeout;
-    
-        return () => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                if (!this.isSearching) {
-                    this.disableSearch();
-                    this.runSearch(this.searchInput.value);
-                    // const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
-                    // document.dispatchEvent(runSearchEvent);
-                }
-            }, timeToWait); 
-        }
-    }
-
-    modifyLocationQuery(searchTerm) {
-        const urlParams = new URLSearchParams(location.search)
-        urlParams.set('query', searchTerm);        
-        const nextURL = location.origin + location.pathname + '?' + urlParams.toString();
-        const nextState = { additionalInformation: '' };
-        const nextTitle = "Stock Exchange Project"
-        window.history.replaceState(nextState, nextTitle, nextURL);
-    }
-
-    turnOnLoading() {
-        document.getElementById('search-button').classList.add('disabled');
-        document.getElementById('search-spinner').classList.remove('d-none');
-        document.getElementById('search-button-text').innerHTML = "Searching...";
-    }
-
-    turnOffLoading() {
-        document.getElementById('search-button').classList.remove('disabled');
-        document.getElementById('search-spinner').classList.add('d-none');
-        document.getElementById('search-button-text').innerHTML = "Search";
-    }
-
-    disableSearch() {
-        this.isSearching = true;
-        document.getElementById('search-input').disabled = true;
-    }
-
-    enableSearch() {
-        this.isSearching = false;
-        document.getElementById('search-input').disabled = false;
-        document.getElementById('search-input').focus();
-    }
-
     onSearch(renderResults) {
         this.renderResults = renderResults;
     }
 
-    // onSearch(renderResults) {
-    //     document.addEventListener('runSearch', async(event) => {
-    //         const resultsFromSearch = await this.runSearch(event.detail.term);
-    //         renderResults(resultsFromSearch, event.detail.term);
-    //     });
-    // }
+    async renderForm() {
+        const HTML = `
+            <form class="" id="search-form" role="search">
+                <div class="row justify-content-evenly m-3 g-0">
+                    <div class="col-9">
+                        <input id="search-input" class="form-control w-100 me-2" type="search" placeholder="Search Company" aria-label="Search" spellcheck="false">
+                    </div>
+                    <div class="col-auto">
+                        <button id="search-button" class="btn btn-outline-dark" style="width: 130px" type="submit">
+                            <span id="search-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            <span id="search-button-text">Search</span>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        `;
+        this.container.innerHTML = HTML;
+    }
 }
-
-

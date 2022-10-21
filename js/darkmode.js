@@ -1,3 +1,9 @@
+/* *********************************************
+*         JS Project #2 - Stock Exchange       * 
+*                  darkmode.js:                *
+*      EXTRA - Darkmode functionality          *
+* **********************************************/
+
 export class Darkmode {
     constructor(container) {
         this.container = container;

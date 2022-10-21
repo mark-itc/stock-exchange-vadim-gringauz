@@ -8,10 +8,6 @@ import { SearchResult } from "./searchResult.js";
 import { SearchForm } from "./searchForm.js";
 import { Darkmode } from "./darkmode.js";
 
-
-let form = {};
-let results = {};
-
 window.onload = async() => { 
     const marqueeProperies = {
         container: document.getElementById('marquee'),
@@ -19,11 +15,11 @@ window.onload = async() => {
         containerB: document.getElementById('marquee-container-b'),
         limit: 100
     }
-    
     let marquee = new Marquee(marqueeProperies);
     marquee.load(); 
-    results = new SearchResult(document.getElementById('search-results'));
-    form = new SearchForm(document.getElementById('form'));
+
+    const results = new SearchResult(document.getElementById('search-results'));
+    const form = new SearchForm(document.getElementById('form'));
 
     // 'searchedTerm' IS NEEDED FOR results.highLight METHOD
     form.onSearch((companies, searchedTerm) => {
@@ -31,8 +27,4 @@ window.onload = async() => {
     });
     
     const darkmode = new Darkmode(document.getElementById('nav'));
-    
-    // form.onSearch((companies, searchedTerm) => {
-    //     results.renderResults(companies, searchedTerm)
-    // });
 }

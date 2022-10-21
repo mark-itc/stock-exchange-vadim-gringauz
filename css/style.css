@@ -19,6 +19,17 @@ body {
     background: var(--main-bg-color);
     color: var(--main-text-color);
 }
+
+.result-row {
+    border-bottom: 1px solid grey;
+}
+.result-row:hover {
+    background-color: lightgray;
+}
+.result-row:hover img {
+    opacity: 0.1;
+  }
+
 mark {
     padding: 0;
     background-color: yellow;
@@ -34,11 +45,11 @@ mark {
     height: 25px;
 }
 
-table {
+#search-found {
     overflow:hidden;
 }
 
-tr {
+.result-row {
     transition:all 1s ease-in-out;
 }
 .slide-out {
@@ -116,4 +127,5 @@ tr {
     .custom-width {
         width: 900px;
     }
+
 }
