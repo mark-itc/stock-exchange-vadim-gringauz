@@ -1,6 +1,6 @@
 ## JS Project #2: :chart_with_downwards_trend: Stock Exchange
 # Milestone :seven: v1.0 
-## Ready for Review (Only when in main branch!)
+## Ready for Review
 ### *Progress:*
 - Milestone 1 :heavy_check_mark:
 - Milestone 2 :heavy_check_mark:
@@ -13,7 +13,7 @@
 - Milestone 6 :heavy_check_mark:
 - Milestone 7 :heavy_check_mark:
 
-all works as required and tested
+all works as required and tested (Used "testing - special cases.docx")
 
 *Special Notes*: 
 - Auto-Search (Milestone 2.1): default delay is set to 500 ms
