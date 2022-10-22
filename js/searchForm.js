@@ -53,7 +53,10 @@ export class SearchForm {
             this.turnOnLoading();
             this.modifyLocationQuery(searchTerm);
             /* ADDED SIMPLE REGEX VALIDATION FOR SOME PROBLEMATIC INPUTS (#,^,&...) */
-            if (/[^A-Za-z0-9]+/g.test(searchTerm)) {this.renderResults([]);}
+            if (/[^A-Za-z0-9]+/g.test(searchTerm)) {
+                this.renderResults([]);
+                return;
+            }
 
             const endpointURL = `${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}`;
             const searchResults = await this.getSearchResults(endpointURL);
