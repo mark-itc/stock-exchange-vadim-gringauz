@@ -1,3 +1,41 @@
+* {
+    --main-bg-color: white;
+    --main-text-color: black;
+}
+
+.darkmode {
+    --main-bg-color: black;
+    --main-text-color: white;
+}
+
+
+.darkmode-btn {
+    height: 20px;
+    font-size: 0.7rem;
+    padding: 0;
+}
+
+body {
+    background: var(--main-bg-color);
+    color: var(--main-text-color);
+}
+
+.result-row {
+    border-bottom: 1px solid grey;
+}
+.result-row:hover {
+    background-color: lightgray;
+}
+.result-row:hover img {
+    opacity: 0.1;
+  }
+
+mark {
+    padding: 0;
+    background-color: yellow;
+    color: inherit;
+}
+
 .spinner-container {
     width: 100vw;
     height: 100vh;
@@ -7,11 +45,11 @@
     height: 25px;
 }
 
-table {
+#search-found {
     overflow:hidden;
 }
 
-tr {
+.result-row {
     transition:all 1s ease-in-out;
 }
 .slide-out {
@@ -19,63 +57,79 @@ tr {
     /* transform:rotateX(90deg); */
 }
 
-@media screen and (min-width: 900px) {
-    .custom-width {
-        width: 900px;
-    }
-}
-
 .marquee {
     height: 50px;
     overflow: hidden;
     position: relative;
-    /* background: #fefefe; */
     color: #333;
     border-bottom: 1px solid black;
 }
 
 .marquee .move {
     position: absolute;
-    width: 100%;
+    width: auto;
     height: 100%;
     margin: 0;
     line-height: 20px;
     text-align: center;
-    -moz-transform: translateX(100%);
-    -webkit-transform: translateX(100%);
-    transform: translateX(100%);
-    -moz-animation: scroll-left 2s linear infinite;
-    -webkit-animation: scroll-left 2s linear infinite;
-    animation: scroll-left 20s linear infinite;
 }
 
-@-moz-keyframes scroll-left {
+.move.first {
+    animation: scroll-left-from-left 100s linear infinite;
+    user-select: none;
+}
+.move.first:hover {
+    animation-play-state: paused;
+}
+
+.move.first:hover ~ .second {
+    animation-play-state: paused;
+}
+
+.move.second {
+    animation: scroll-left-from-right 100s linear infinite;
+    user-select: none;
+}
+.move.second:hover {
+    animation-play-state: paused;
+}
+.move.second:hover ~ .first {
+    animation-play-state: paused;
+}
+
+.marquee-element:nth-child(3n) {
+    color: darkblue;
+}
+.marquee-element:nth-child(3n-1) {
+    color: #2F4F4F;
+}
+
+.img-thumbnail {
+    min-width: 30px;
+}
+
+@keyframes scroll-left-from-left {
     0% {
-        -moz-transform: translateX(100%);
+        transform: translateX(0);
     }
     100% {
-        -moz-transform: translateX(-100%);
+        transform: translateX(-100%);
     }
 }
 
-@-webkit-keyframes scroll-left {
+@keyframes scroll-left-from-right {
     0% {
-        -webkit-transform: translateX(100%);
-    }
-    100% {
-        -webkit-transform: translateX(-100%);
-    }
-}
-
-@keyframes scroll-left {
-    0% {
-        -moz-transform: translateX(100%);
-        -webkit-transform: translateX(100%);
         transform: translateX(100%);
     }
     100% {
-        -moz-transform: translateX(-100%);
-        -webkit-transform: translateX(-100%);
-        transform: translateX(-100%);
+        transform: translateX(0%);
     }
+
+}
+
+@media screen and (min-width: 900px) {
+    .custom-width {
+        width: 900px;
+    }
+
 }
