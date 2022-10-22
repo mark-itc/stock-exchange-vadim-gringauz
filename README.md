@@ -15,6 +15,11 @@
 
 all works as required and tested
 
-*Instructions*:
+*Special Notes*: 
+- Auto-Search (Milestone 2.1): default delay is set to 500 ms
+- Marquee (Milestone 4): default limit is 100 compaines
+- Milestone 3.1: Did not implement with promise.all
+
+:pray: **Worked really hard on this - Would appreciate as much feedback as possible, both positive and negative** :pray:
 
 ### :basketball: Vadim Gringauz :basketball:
