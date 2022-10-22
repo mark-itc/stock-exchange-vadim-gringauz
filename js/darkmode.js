@@ -27,7 +27,6 @@ export class Darkmode {
     }
 
     toggle() {
-        console.log('toggle darkmode');
         document.querySelector('body').classList.toggle('darkmode');
         document.querySelector('nav').classList.toggle('bg-danger');
         document.querySelector('nav').classList.toggle('bg-primary');

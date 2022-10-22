@@ -23,7 +23,6 @@ export class SearchResult {
     }
 
     async renderResults(searchResults, searchedTerm) {
-        // console.log('searchResults=', searchResults, "searchedTerm", searchedTerm);
         await this.reset();
         
         if (searchResults.length === 0) {

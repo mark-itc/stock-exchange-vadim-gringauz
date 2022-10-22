@@ -60,7 +60,6 @@ export class SearchForm {
 
             const endpointURL = `${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}`;
             const searchResults = await this.getSearchResults(endpointURL);
-            // console.log('searchResults=', searchResults);
             this.renderResults(await this.addImageAndPrice(searchResults) ,searchTerm);         
         } catch(error) {
             console.log('Error caught inside runSearch', error);
@@ -74,7 +73,6 @@ export class SearchForm {
         try {
             const response = await fetch(url);
             const allSearchResults = await response.json();
-            // console.log('allSearchResults: ', allSearchResults);
             return allSearchResults;
         } catch(error) {
             console.log('error:', error);
@@ -159,7 +157,6 @@ export class SearchForm {
             url += symbolsString;
             const response = await fetch(url);
             const data = await response.json();
-            // console.log('data', data);
             
             if (symbols.length === 1) {
                 if (data.symbol) {
@@ -220,7 +217,6 @@ export class SearchForm {
         } else {
             symbols.forEach((symbol) => {
                 if (!data.companyProfiles.find(element => element.symbol === symbol)) {
-                    console.log('does not exist:', symbol);
                     const missingProfile = {
                         symbol: symbol,
                         profile: {

@@ -95,7 +95,6 @@ class Company {
             const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/${symbol}`;
             const response = await fetch(url);
             const companyProfileData = await response.json();
-            // console.log('companyProfileData: ', companyProfileData);
             if (companyProfileData.symbol) {
                 return companyProfileData;
             } else {
