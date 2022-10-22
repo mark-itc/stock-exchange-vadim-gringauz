@@ -33,6 +33,10 @@ export class Marquee {
         const HTML = `
             <div id="marquee-container-a" class="move first d-flex flex-nowrap"></div>
             <div id="marquee-container-b" class="move second d-flex flex-nowrap"></div>
+
+            <template id="marquee-item-template" class="marquee-item">
+                <span  id="marquee-item-" class="marquee-element m-2" style="flex-wrap: nowrap;">[symbol] [stock price]</span>
+            </template>
         `;
         this.container.innerHTML = HTML;
     }

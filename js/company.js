@@ -133,7 +133,6 @@ class Company {
 
         document.getElementById('price').innerHTML = "$" + profile.profile.price;
         let changePercentage  = parseFloat(profile.profile.changesPercentage).toFixed(2);
-        // changePercentage *= -1;
         const changeDiv =  document.getElementById('change');
         if (changePercentage < 0) {
             changeDiv.classList.add('text-danger');

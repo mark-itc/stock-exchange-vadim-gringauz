@@ -15,16 +15,18 @@ window.onload = async() => {
         containerB: document.getElementById('marquee-container-b'),
         limit: 100
     }
-    let marquee = new Marquee(marqueeProperies);
+    const marquee = new Marquee(marqueeProperies);
     marquee.load(); 
-
-    const results = new SearchResult(document.getElementById('search-results'));
     const form = new SearchForm(document.getElementById('form'));
+    const results = new SearchResult(document.getElementById('search-results'));
 
-    // 'searchedTerm' IS NEEDED FOR results.highLight METHOD
+    /* 'searchedTerm' WAS ADDED FOR SearchResult.highLight METHOD 
+     *  I THOUGHT IT'S BETTER THAN MAKE SearchResult GET IT FROM 
+     *  FORM'S inputbox.value                                     */ 
     form.onSearch((companies, searchedTerm) => {
         results.renderResults(companies, searchedTerm)
     });
     
+    /* EXTRA FEATURE - JUST FOR MY OWN PRACTICE */
     const darkmode = new Darkmode(document.getElementById('nav'));
 }

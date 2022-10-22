@@ -104,6 +104,10 @@ mark {
     color: #2F4F4F;
 }
 
+.img-thumbnail {
+    min-width: 30px;
+}
+
 @keyframes scroll-left-from-left {
     0% {
         transform: translateX(0);

@@ -88,8 +88,6 @@ export class SearchForm {
                 if (!this.isSearching) {
                     this.disableSearch();
                     this.runSearch(this.searchInput.value);
-                    // const runSearchEvent = new CustomEvent("runSearch", {detail: {term: this.searchInput.value}});
-                    // document.dispatchEvent(runSearchEvent);
                 }
             }, timeToWait); 
         }
@@ -125,6 +123,10 @@ export class SearchForm {
         this.isSearching = false;
         document.getElementById('search-input').disabled = false;
         document.getElementById('search-input').focus();
+    }
+
+    async addImageAndPrice1(searchResults) {
+        
     }
 
     async addImageAndPrice(searchResults) {

@@ -6,70 +6,12 @@
 
 export class SearchResult {
     constructor(container) {
-        this.container = container
+        this.container = container;
         this.#init();
     }
 
     async #init() {
         await this.renderHTML();     
-    }
-
-    async renderHTML() {
-        const divsHTML = `
-            <div id="search-found" class="d-none">
-
-
-            <!--
-                <table class="table table-hover table-borderless">
-                    <thead></thead>
-                    <tbody id="result-table-body"></tbody>
-                </table>
-            -->
-            </div>
-            
-
-            <div id="search-error-msg"></div>
-        `;
-        const templateHTML = `
-            <template id="search-result-template">
-                <div id="search-result-" class="d-flex flex-row result-row justify-content-between align-items-end pt-2 overflow-visible">
-                    <div class="d-flex flex-row align-items-end">
-                        <div>
-                            <img  style="height: 30px;" class="img-thumbnail" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="">
-                        </div>
-                        <div class="ms-2" style="height: 33px;">
-                            <a class="fs-4 overflow-hidden text-nowrap" href="">[Name]</a>
-                        </div>
-                        <div class="ms-2">
-                            <span class="symbol text-secondary">([Symbol])</span>
-                        </div>
-                    </div>
-                    <div class="d-flex flex-row">
-                        <div>
-                            <span class="changes">([changes])</span>
-                        </div>
-                    </div>
-                </div>
-            </template>
-        `;
-        this.container.innerHTML = divsHTML + templateHTML;
-        
-        const noMatchDiv = document.createElement('div');
-        noMatchDiv.id = "search-not-found";
-        noMatchDiv.classList.add('d-none');
-        noMatchDiv.innerHTML = `
-            <div class="row justify-content-center align-items-center">
-                <div class="col-2">
-                    <img src="https://www.svgrepo.com/show/164118/sad.svg" class="img-fluid">
-                </div>
-                <div class="col-auto fs-3">Sorry, no match was found</div>
-            </div>
-        `;
-        this.container.appendChild(noMatchDiv);
-
-        this.foundDiv = document.getElementById('search-found');
-        this.notFoundDiv = document.getElementById('search-not-found');
-        this.errorMsgDiv = document.getElementById('search-error-msg');
     }
 
     async reset() {
@@ -123,11 +65,11 @@ export class SearchResult {
                 this.foundDiv.appendChild(clone);
             });
             this.foundDiv.classList.remove('d-none');
-            this.slideInTable();
+            this.slideInResults();
         }
     }
 
-    slideInTable() {
+    slideInResults() {
         const rows = Array.from(document.querySelectorAll('.result-row'));
 
         function slideOut(row) {
@@ -139,7 +81,6 @@ export class SearchResult {
             row.classList.remove('slide-out');
           }, (index + 5) * 100);  
         }
-        
         rows.forEach(slideOut);
         rows.forEach(slideIn); 
     }
@@ -149,5 +90,52 @@ export class SearchResult {
         const regexTerm = new RegExp(term, 'i');
         newString = string.replace(regexTerm,`<mark>$&</mark>`);
         return newString;
+    }
+
+    async renderHTML() {
+        const divsHTML = `
+            <div id="search-found" class="d-none"></div>
+            <div id="search-error-msg"></div>
+        `;
+        const templateHTML = `
+            <template id="search-result-template">
+                <div id="search-result-" class="d-flex flex-row result-row justify-content-between align-items-end pt-2 overflow-visible">
+                    <div class="d-flex flex-row align-items-end">
+                        <div class="">
+                            <img  style="height: 30px;" class="img-thumbnail" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="">
+                        </div>
+                        <div class="ms-2" style="height: 33px;">
+                            <a class="fs-4 overflow-hidden text-nowrap" href="">[Name]</a>
+                        </div>
+                        <div class="ms-2">
+                            <span class="symbol text-secondary">([Symbol])</span>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row">
+                        <div>
+                            <span class="changes">([changes])</span>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        `;
+        this.container.innerHTML = divsHTML + templateHTML;
+        
+        const noMatchDiv = document.createElement('div');
+        noMatchDiv.id = "search-not-found";
+        noMatchDiv.classList.add('d-none');
+        noMatchDiv.innerHTML = `
+            <div class="row justify-content-center align-items-center">
+                <div class="col-2">
+                    <img src="https://www.svgrepo.com/show/164118/sad.svg" class="img-fluid">
+                </div>
+                <div class="col-auto fs-3">Sorry, no match was found</div>
+            </div>
+        `;
+        this.container.appendChild(noMatchDiv);
+
+        this.foundDiv = document.getElementById('search-found');
+        this.notFoundDiv = document.getElementById('search-not-found');
+        this.errorMsgDiv = document.getElementById('search-error-msg');
     }
 }
