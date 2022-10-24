@@ -21,15 +21,42 @@ body {
 }
 
 .result-row {
+    background-color: transparent;
     border-bottom: 1px solid grey;
+    height: 40px;
+    transition: 0;
 }
 .result-row:hover {
     background-color: lightgray;
+    transition: 0ms;
 }
 .result-row:hover img {
     opacity: 0.1;
-  }
+    transition: 0ms;
+}
 
+.a-results {
+    text-decoration: none;
+}
+.img {
+    padding-bottom: 4px;
+}
+.name {
+    max-width: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.5rem;
+}
+.symbol {
+    font-size: 1rem;
+    padding-bottom: 4px;
+}
+.changes {
+    font-size: 1rem;
+    padding-bottom: 4px;
+    color: black;
+}
 mark {
     padding: 0;
     background-color: yellow;
@@ -132,4 +159,17 @@ mark {
         width: 900px;
     }
 
+}
+
+@media screen and (max-width: 900px) {
+    #search-results {
+        margin-left: 0 !important;
+        width: 100vw !important;
+    }
+
+    .input-div {
+        width: 75%;
+        left: 0;
+        margin: 0;
+    }
 }

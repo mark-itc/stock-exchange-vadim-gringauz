@@ -4,10 +4,11 @@
 *         All search form functionality        *
 * **********************************************/
 
+import { serverURL } from './globals.js'
 export class SearchForm {
     constructor(container) {
         this.container = container;
-        this.endPoint = 'https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/search';
+        this.searchEndPoint = serverURL + "/search";
         this.limit = 10;
         this.exchange = 'NASDAQ';
         this.isSearching = false;
@@ -27,7 +28,7 @@ export class SearchForm {
             }
         });
 
-        /* RUN SEARCH AUTOMATICALLY ON TYPING (WITH DELAY! )*/
+        /* RUN SEARCH AUTOMATICALLY ON TYPING (WITH DELAY! ) */
         const autoSearch = this.debounceSearch(500);
         this.searchInput.addEventListener('input', autoSearch);
 
@@ -58,7 +59,7 @@ export class SearchForm {
                 return;
             }
 
-            const endpointURL = `${this.endPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}`;
+            const endpointURL = `${this.searchEndPoint}?query=${searchTerm}&limit=${this.limit}&exchange=${this.exchange}`;
             const searchResults = await this.getSearchResults(endpointURL);
             this.renderResults(await this.addImageAndPrice(searchResults) ,searchTerm);         
         } catch(error) {
@@ -152,7 +153,7 @@ export class SearchForm {
 
     async getMultipleCompanyProfiles(partialProfiles, symbols) {
         try {
-            let url = "https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/";
+            let url = serverURL + "/company/profile/";
             const symbolsString = symbols.toString();
             url += symbolsString;
             const response = await fetch(url);
@@ -238,8 +239,8 @@ export class SearchForm {
     async renderForm() {
         const HTML = `
             <form class="" id="search-form" role="search">
-                <div class="row justify-content-evenly m-3 g-0">
-                    <div class="col-9">
+                <div class="row justify-content-evenly m-3 g-0 flex-nowrap">
+                    <div class="input-div col-9">
                         <input id="search-input" class="form-control w-100 me-2" type="search" placeholder="Search Company" aria-label="Search" spellcheck="false">
                     </div>
                     <div class="col-auto">

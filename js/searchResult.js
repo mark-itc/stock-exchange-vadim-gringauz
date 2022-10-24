@@ -3,7 +3,7 @@
 *              SearchResult.js:                *
 *       All search results functionality       *
 * **********************************************/
-
+import { imgNotAvailable } from './globals.js'
 export class SearchResult {
     constructor(container) {
         this.container = container;
@@ -40,14 +40,13 @@ export class SearchResult {
                 const template = document.getElementById('search-result-template');
                 const clone = template.content.cloneNode(true);
                 clone.getElementById('search-result-').id += index;
-                const a = clone.querySelector('a');
-                a.href = `./company.html?symbol=${searchResult.symbol}`;
-                a.innerHTML = `${this.highlightTerm(searchedTerm, searchResult.name)}`;
+                clone.querySelector('a').href = `./company.html?symbol=${searchResult.symbol}`;
+                clone.querySelector('.name').innerHTML = `${this.highlightTerm(searchedTerm, searchResult.name)}`;
                 clone.querySelector('.symbol').innerHTML = `(${this.highlightTerm(searchedTerm, searchResult.symbol)})`;
                 const img = clone.querySelector('img');
                 img.src = searchResult.image;
                 img.addEventListener('error', () => {
-                    img.src = "https://www.svgrepo.com/show/92170/not-available-circle.svg";
+                    img.src = imgNotAvailable;
                 });
                 const changesSpan = clone.querySelector('.changes');
                 let changesAsPercentage  = parseFloat(searchResult.changesPercentage).toFixed(2);
@@ -98,23 +97,15 @@ export class SearchResult {
         `;
         const templateHTML = `
             <template id="search-result-template">
-                <div id="search-result-" class="d-flex flex-row result-row justify-content-between align-items-end pt-2 overflow-visible">
-                    <div class="d-flex flex-row align-items-end">
-                        <div class="">
-                            <img  style="height: 30px;" class="img-thumbnail" src="https://www.svgrepo.com/show/92170/not-available-circle.svg" alt="">
-                        </div>
-                        <div class="ms-2" style="height: 33px;">
-                            <a class="fs-4 overflow-hidden text-nowrap" href="">[Name]</a>
-                        </div>
-                        <div class="ms-2">
+                <div id="search-result-" class="d-flex flex-row result-row justify-content-between overflow-visible">
+                    <a class="a-results h-100 w-100" href="">
+                        <div class="d-flex align-items-end gap-2 w-100">
+                            <img  style="height: 30px;" class="img-thumbnail" src="${imgNotAvailable}" alt="">
+                            <span class="name">[Name]</span>
                             <span class="symbol text-secondary">([Symbol])</span>
+                            <span class="changes ms-auto">([changes])</span>
                         </div>
-                    </div>
-                    <div class="d-flex flex-row">
-                        <div>
-                            <span class="changes">([changes])</span>
-                        </div>
-                    </div>
+                    </a>
                 </div>
             </template>
         `;

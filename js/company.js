@@ -1,3 +1,4 @@
+import { serverURL } from './globals.js'
 import { Darkmode } from "./darkmode.js";
 
 class Company {
@@ -92,7 +93,7 @@ class Company {
 
     async getProfile(symbol) {
         try {
-            const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/company/profile/${symbol}`;
+            const url = `${serverURL}/company/profile/${symbol}`;
             const response = await fetch(url);
             const companyProfileData = await response.json();
             if (companyProfileData.symbol) {

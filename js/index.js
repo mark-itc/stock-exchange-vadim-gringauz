@@ -8,7 +8,7 @@ import { SearchResult } from "./searchResult.js";
 import { SearchForm } from "./searchForm.js";
 import { Darkmode } from "./darkmode.js";
 
-window.onload = async() => { 
+window.onload = async() => {
     const marqueeProperies = {
         container: document.getElementById('marquee'),
         containerA: document.getElementById('marquee-container-a'),

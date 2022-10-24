@@ -3,7 +3,7 @@
 *                 marquee.js:                  *
 *     All index.html marquee functionality     *
 * **********************************************/
-
+import { serverURL } from './globals.js';
 export class Marquee {
     constructor(properties) {
         this.container = properties.container;
@@ -19,7 +19,7 @@ export class Marquee {
 
     async getData(limit) {
         try {
-            const url = `https://stock-exchange-dot-full-stack-course-services.ew.r.appspot.com/api/v3/stock-screener?exchange=NASDAQ&limit=${limit}`;
+            const url = `${serverURL}/stock-screener?exchange=NASDAQ&limit=${limit}`;
             const response = await fetch(url);
             const fullData = await response.json();
             return fullData.map(({price, symbol}) => ({ symbol: symbol, price: price }));
