@@ -1,0 +1,175 @@
+* {
+    --main-bg-color: white;
+    --main-text-color: black;
+}
+
+.darkmode {
+    --main-bg-color: black;
+    --main-text-color: white;
+}
+
+
+.darkmode-btn {
+    height: 20px;
+    font-size: 0.7rem;
+    padding: 0;
+}
+
+body {
+    background: var(--main-bg-color);
+    color: var(--main-text-color);
+}
+
+.result-row {
+    background-color: transparent;
+    border-bottom: 1px solid grey;
+    height: 40px;
+    transition: 0;
+}
+.result-row:hover {
+    background-color: lightgray;
+    transition: 0ms;
+}
+.result-row:hover img {
+    opacity: 0.1;
+    transition: 0ms;
+}
+
+.a-results {
+    text-decoration: none;
+}
+.img {
+    padding-bottom: 4px;
+}
+.name {
+    max-width: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1.5rem;
+}
+.symbol {
+    font-size: 1rem;
+    padding-bottom: 4px;
+}
+.changes {
+    font-size: 1rem;
+    padding-bottom: 4px;
+    color: black;
+}
+mark {
+    padding: 0;
+    background-color: yellow;
+    color: inherit;
+}
+
+.spinner-container {
+    width: 100vw;
+    height: 100vh;
+}
+
+.custom-height {
+    height: 25px;
+}
+
+#search-found {
+    overflow:hidden;
+}
+
+.result-row {
+    transition: rotateX 1s ease-in-out;
+}
+.slide-out {
+    transform:translateX(100%);
+    /* transform:rotateX(90deg); */
+}
+
+.marquee {
+    height: 50px;
+    overflow: hidden;
+    position: relative;
+    color: #333;
+    border-bottom: 1px solid black;
+}
+
+.marquee .move {
+    position: absolute;
+    width: auto;
+    height: 100%;
+    margin: 0;
+    line-height: 20px;
+    text-align: center;
+}
+
+.move.first {
+    animation: scroll-left-from-left 100s linear infinite;
+    user-select: none;
+}
+.move.first:hover {
+    animation-play-state: paused;
+}
+
+.move.first:hover ~ .second {
+    animation-play-state: paused;
+}
+
+.move.second {
+    animation: scroll-left-from-right 100s linear infinite;
+    user-select: none;
+}
+.move.second:hover {
+    animation-play-state: paused;
+}
+.move.second:hover ~ .first {
+    animation-play-state: paused;
+}
+
+.marquee-element:nth-child(3n) {
+    color: darkblue;
+}
+.marquee-element:nth-child(3n-1) {
+    color: #2F4F4F;
+}
+
+.img-thumbnail {
+    min-width: 30px;
+}
+
+@keyframes scroll-left-from-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes scroll-left-from-right {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(0%);
+    }
+
+}
+
+@media screen and (min-width: 900px) {
+    .custom-width {
+        width: 900px;
+    }
+
+}
+
+@media screen and (max-width: 900px) {
+    #search-results {
+        margin-left: 0 !important;
+        width: 100vw !important;
+    }
+
+    .input-div {
+        width: 75%;
+        left: 0;
+        margin: 0;
+    }
+}
