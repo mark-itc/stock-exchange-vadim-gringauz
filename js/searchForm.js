@@ -127,7 +127,31 @@ export class SearchForm {
         document.getElementById('search-input').focus();
     }
 
-    async addImageAndPrice1(searchResults) {
+    async addImageAndPriceSimple(searchResults) {
+        try {
+            console.time();
+            const newSearchResults = [];
+            searchResults.forEach(async(result) => {
+                console.log('result.symbol=', result.symbol);
+                const response = await fetch(`${serverURL}/company/profile/${result.symbol}`);
+                const profileData = await response.json();
+                console.log('profileData=', profileData);
+
+                const newResult = {
+                    ...result,
+                    image: profileData.profile.image,
+                    changesPercentage: profileData.profile.changesPercentage
+                };
+                newSearchResults.push(newResult);
+            });
+            console.log('newSearchResults=', newSearchResults);
+            return newSearchResults;
+        } catch(error) {
+            console.log('error inside addImageAndPriceSimple', error);
+            return searchResults;
+        } finally {
+            console.timeEnd();
+        }
         
     }
 

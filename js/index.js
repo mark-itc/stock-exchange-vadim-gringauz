@@ -30,3 +30,4 @@ window.onload = async() => {
     /* EXTRA FEATURE - JUST FOR MY OWN PRACTICE */
     const darkmode = new Darkmode(document.getElementById('nav'));
 }
+

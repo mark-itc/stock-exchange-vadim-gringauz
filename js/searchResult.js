@@ -24,7 +24,7 @@ export class SearchResult {
 
     async renderResults(searchResults, searchedTerm) {
         await this.reset();
-        
+        // console.log('in render:', searchResults);
         if (searchResults.length === 0) {
             // EMPTY ARRAY = NO MATCH WAS FOUND
             document.getElementById('search-not-found').classList.remove('d-none');
@@ -48,22 +48,25 @@ export class SearchResult {
                 img.addEventListener('error', () => {
                     img.src = imgNotAvailable;
                 });
-                const changesSpan = clone.querySelector('.changes');
-                let changesAsPercentage  = parseFloat(searchResult.changesPercentage).toFixed(2);
-    
-                if (changesAsPercentage < 0) {
-                    changesSpan.classList.add('text-danger');
-                    changesSpan.innerHTML = `(${changesAsPercentage}%)`;
-                } else if (changesAsPercentage > 0) {
-                    changesSpan.classList.add('text-success');
-                    changesSpan.innerHTML = `(+${changesAsPercentage}%)`;
-                } else {
-                    changesSpan.innerHTML = `(${changesAsPercentage}%)`;
-                }
+                clone.querySelector('.changes').innerHTML = this.fixedValueOfChanges(searchResult.changesPercentage);
                 this.foundDiv.appendChild(clone);
             });
             this.foundDiv.classList.remove('d-none');
             this.slideInResults();
+        }
+    }
+
+    fixedValueOfChanges(changesValue) {
+        let changesAsPercentage  = parseFloat(changesValue).toFixed(2);
+
+        if (changesAsPercentage < 0) {
+            return `<span class="text-danger">(${changesAsPercentage}%)</span>`;
+        }
+        if (changesAsPercentage > 0) {
+            return `<span class="text-success">(+${changesAsPercentage}%)</span>`;
+        } 
+        if (changesAsPercentage == 0) {
+            return `(${changesAsPercentage}%)`;
         }
     }
 
